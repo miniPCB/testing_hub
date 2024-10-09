@@ -1,0 +1,7 @@
+Board Name: ef_ctrl
+Board Revision: 0001
+Board Variant: 1
+Board Serial Number: 00024
+Message: 2024-08-26 20:18:28 - pi@raspberrypi - LABEL CREATED
+Message: 2024-08-26 20:19:14 - pi@raspberrypi - BRING-UP TEST: PASS
+Message: 2024-08-26 20:19:25 - pi@raspberrypi - FINAL ASSEMBLY TEST: PASS

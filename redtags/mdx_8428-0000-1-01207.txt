@@ -1,0 +1,5 @@
+Board Name: mdx_8428
+Board Revision: 0000
+Board Variant: 1
+Board Serial Number: 01207
+Message: 2024-08-22 22:29:55 - pi@raspberrypi - At Nolan's desk.

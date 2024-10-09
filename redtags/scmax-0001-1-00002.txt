@@ -1,0 +1,5 @@
+Board Name: scmax
+Board Revision: 0001
+Board Variant: 1
+Board Serial Number: 00002
+Message: 2024-08-22 22:31:39 - pi@raspberrypi - U2 runs very hot.

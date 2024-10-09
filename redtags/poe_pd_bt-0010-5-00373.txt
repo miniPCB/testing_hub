@@ -1,0 +1,8 @@
+Board Name: poe_pd_bt
+Board Revision: 0010
+Board Variant: 5
+Board Serial Number: 00373
+Message: 2024-09-09 18:29:40 - pi@raspberrypi - Applied Barcode
+Message: 2024-09-09 18:29:51 - pi@raspberrypi - PASSED Bring-up Testing
+Message: 2024-09-09 18:29:58 - pi@raspberrypi - PASSED Final Assembly Testing
+Message: 2024-09-09 18:45:49 - pi@raspberrypi - I2C communication fails

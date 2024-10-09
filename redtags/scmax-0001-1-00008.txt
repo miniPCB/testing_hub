@@ -1,0 +1,5 @@
+Board Name: scmax
+Board Revision: 0001
+Board Variant: 1
+Board Serial Number: 00008
+Message: 2024-08-22 22:32:14 - pi@raspberrypi - At Nolan's desk.

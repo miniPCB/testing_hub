@@ -1,0 +1,5 @@
+Board Name: mez_ephy_rj45
+Board Revision: 0000
+Board Variant: 1
+Board Serial Number: 00004
+Message: 2024-08-22 22:28:52 - pi@raspberrypi - At Nolan's desk.

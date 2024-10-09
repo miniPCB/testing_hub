@@ -1,0 +1,5 @@
+Board Name: poe_pd
+Board Revision: 0000
+Board Variant: 1
+Board Serial Number: 01010
+Message: 2024-08-22 22:28:23 - pi@raspberrypi - At Nolan's desk.
