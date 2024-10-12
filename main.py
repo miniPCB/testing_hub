@@ -213,30 +213,7 @@ class TestLauncher(QWidget):
         self.process_flow_tab.setLayout(layout)
 
     def setup_red_tag_messages_tab(self):
-        """Sets up the Red Tag Messages tab UI with two sub-tabs: View and Apply."""
-        layout = QVBoxLayout()
-
-        # Create the tab widget for View and Apply sub-tabs
-        self.red_tag_sub_tab_widget = QTabWidget()
-
-        # Setup View tab
-        self.view_tab = QWidget()
-        self.setup_red_tag_view_tab()  # Separate function to set up the View tab content
-        self.red_tag_sub_tab_widget.addTab(self.view_tab, "View")
-
-        # Setup Apply tab (empty for now, to be populated later)
-        self.apply_tab = QWidget()
-        self.setup_red_tag_apply_tab()  # Separate function to set up the Apply tab content
-        self.red_tag_sub_tab_widget.addTab(self.apply_tab, "Apply")
-
-        # Add the tab widget to the main layout
-        layout.addWidget(self.red_tag_sub_tab_widget)
-
-        # Set the layout for the Red Tag Messages tab
-        self.red_tag_messages_tab.setLayout(layout)
-
-    def setup_red_tag_view_tab(self):
-        """Sets up the content for the View tab."""
+        """Sets up the Red Tag Messages tab UI."""
         layout = QVBoxLayout()
 
         # Create the red tag display area
@@ -260,19 +237,8 @@ class TestLauncher(QWidget):
         # Add the input layout to the main layout
         layout.addLayout(input_layout)
 
-        # Set the layout for the View tab
-        self.view_tab.setLayout(layout)
-
-    def setup_red_tag_apply_tab(self):
-        """Sets up the content for the Apply tab (empty for now)."""
-        layout = QVBoxLayout()
-
-        # Placeholder for future content in the Apply tab
-        placeholder_label = QLabel("Apply Tab Content Goes Here")
-        layout.addWidget(placeholder_label)
-
-        # Set the layout for the Apply tab
-        self.apply_tab.setLayout(layout)
+        # Set the layout for the tab
+        self.red_tag_messages_tab.setLayout(layout)
 
     def on_add_red_tag_message(self):
         """Handles the addition of a red tag message."""
