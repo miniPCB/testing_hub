@@ -123,6 +123,10 @@
         {
             "timestamp": "20241012_081143",
             "red_tag_message": "This should work."
+        },
+        {
+            "timestamp": "20241012_081959",
+            "red_tag_message": "Type a new message"
         }
     ]
 }
