@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241011_150357",
+            "barcode": "pt_tlxx-0002-3-02590",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241011_150413",
+            "red_tag_message": "3V3 SHORT, NOT BGA"
+        }
+    ]
+}

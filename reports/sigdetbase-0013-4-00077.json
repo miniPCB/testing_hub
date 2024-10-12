@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241011_152947",
+            "barcode": "sigdetbase-0013-4-00077",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241011_153052",
+            "red_tag_message": "While connected to J10, it did not respond when testing light phase."
+        }
+    ]
+}

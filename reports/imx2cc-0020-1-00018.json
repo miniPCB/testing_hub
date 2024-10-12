@@ -1,8 +1,8 @@
 {
     "test_reports": [
         {
-            "timestamp": "20241009_085239",
-            "barcode": "imx2cc-0020-1-00009-B",
+            "timestamp": "20241008_113114",
+            "barcode": "imx2cc-0020-1-00018-B",
             "overall_status": "Pass",
             "test_results": [
                 {
@@ -11,7 +11,7 @@
                     "target_value": 0.62,
                     "lower_limit": 0.42,
                     "upper_limit": 0.82,
-                    "measured_value": 0.606,
+                    "measured_value": 0.569,
                     "conclusion": "Pass"
                 },
                 {
@@ -20,7 +20,7 @@
                     "target_value": 0.48,
                     "lower_limit": 0.28,
                     "upper_limit": 0.68,
-                    "measured_value": 0.487,
+                    "measured_value": 0.486,
                     "conclusion": "Pass"
                 },
                 {
@@ -38,7 +38,7 @@
                     "target_value": 0.73,
                     "lower_limit": 0.53,
                     "upper_limit": 0.93,
-                    "measured_value": 0.733,
+                    "measured_value": 0.734,
                     "conclusion": "Pass"
                 },
                 {
@@ -47,7 +47,7 @@
                     "target_value": 0.77,
                     "lower_limit": 0.57,
                     "upper_limit": 0.97,
-                    "measured_value": 0.775,
+                    "measured_value": 0.772,
                     "conclusion": "Pass"
                 },
                 {
@@ -56,7 +56,7 @@
                     "target_value": 0.79,
                     "lower_limit": 0.59,
                     "upper_limit": 0.99,
-                    "measured_value": 0.79,
+                    "measured_value": 0.788,
                     "conclusion": "Pass"
                 },
                 {
@@ -74,7 +74,7 @@
                     "target_value": 0.87,
                     "lower_limit": 0.67,
                     "upper_limit": 1.07,
-                    "measured_value": 0.862,
+                    "measured_value": 0.866,
                     "conclusion": "Pass"
                 },
                 {
@@ -83,7 +83,7 @@
                     "target_value": 0.92,
                     "lower_limit": 0.72,
                     "upper_limit": 1.02,
-                    "measured_value": 0.929,
+                    "measured_value": 0.93,
                     "conclusion": "Pass"
                 },
                 {

@@ -1,0 +1,209 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241008_114545",
+            "barcode": "imx2cc-0020-1-00020-B",
+            "overall_status": "Fail",
+            "test_results": [
+                {
+                    "test_number": 1,
+                    "description": "VDD_2V9",
+                    "target_value": 0.62,
+                    "lower_limit": 0.42,
+                    "upper_limit": 0.82,
+                    "measured_value": 0.569,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 2,
+                    "description": "EE_1V8",
+                    "target_value": 0.48,
+                    "lower_limit": 0.28,
+                    "upper_limit": 0.68,
+                    "measured_value": 0.481,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 3,
+                    "description": "5V_SCL",
+                    "target_value": 1.1,
+                    "lower_limit": 1.0,
+                    "upper_limit": 1.2,
+                    "measured_value": 1.094,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 4,
+                    "description": "SCL",
+                    "target_value": 0.73,
+                    "lower_limit": 0.53,
+                    "upper_limit": 0.93,
+                    "measured_value": 0.001,
+                    "conclusion": "Fail"
+                },
+                {
+                    "test_number": 5,
+                    "description": "VDD_1V8",
+                    "target_value": 0.77,
+                    "lower_limit": 0.57,
+                    "upper_limit": 0.97,
+                    "measured_value": 0.769,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 6,
+                    "description": "VDD_3V3",
+                    "target_value": 0.79,
+                    "lower_limit": 0.59,
+                    "upper_limit": 0.99,
+                    "measured_value": 0.788,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 7,
+                    "description": "DVDD_CAM_IO_1V8",
+                    "target_value": 0.45,
+                    "lower_limit": 0.25,
+                    "upper_limit": 0.65,
+                    "measured_value": 0.22,
+                    "conclusion": "Fail"
+                },
+                {
+                    "test_number": 8,
+                    "description": "5V_SDA",
+                    "target_value": 0.87,
+                    "lower_limit": 0.67,
+                    "upper_limit": 1.07,
+                    "measured_value": 0.862,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 9,
+                    "description": "VDD_1V1",
+                    "target_value": 0.92,
+                    "lower_limit": 0.72,
+                    "upper_limit": 1.02,
+                    "measured_value": 0.93,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 10,
+                    "description": "SDA",
+                    "target_value": 0.73,
+                    "lower_limit": 0.53,
+                    "upper_limit": 0.93,
+                    "measured_value": 0.545,
+                    "conclusion": "Pass"
+                }
+            ]
+        },
+        {
+            "timestamp": "20241011_123054",
+            "barcode": "imx2cc-0020-1-00020-B",
+            "overall_status": "Fail",
+            "test_results": [
+                {
+                    "test_number": 1,
+                    "description": "VDD_2V9",
+                    "target_value": 0.62,
+                    "lower_limit": 0.42,
+                    "upper_limit": 0.82,
+                    "measured_value": 0.589,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 2,
+                    "description": "EE_1V8",
+                    "target_value": 0.48,
+                    "lower_limit": 0.28,
+                    "upper_limit": 0.68,
+                    "measured_value": 0.48,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 3,
+                    "description": "5V_SCL",
+                    "target_value": 1.1,
+                    "lower_limit": 1.0,
+                    "upper_limit": 1.2,
+                    "measured_value": 1.093,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 4,
+                    "description": "SCL",
+                    "target_value": 0.73,
+                    "lower_limit": 0.53,
+                    "upper_limit": 0.93,
+                    "measured_value": 0.0,
+                    "conclusion": "Fail"
+                },
+                {
+                    "test_number": 5,
+                    "description": "VDD_1V8",
+                    "target_value": 0.77,
+                    "lower_limit": 0.57,
+                    "upper_limit": 0.97,
+                    "measured_value": 0.766,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 6,
+                    "description": "VDD_3V3",
+                    "target_value": 0.79,
+                    "lower_limit": 0.59,
+                    "upper_limit": 0.99,
+                    "measured_value": 0.785,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 7,
+                    "description": "DVDD_CAM_IO_1V8",
+                    "target_value": 0.45,
+                    "lower_limit": 0.25,
+                    "upper_limit": 0.65,
+                    "measured_value": 0.22,
+                    "conclusion": "Fail"
+                },
+                {
+                    "test_number": 8,
+                    "description": "5V_SDA",
+                    "target_value": 0.87,
+                    "lower_limit": 0.67,
+                    "upper_limit": 1.07,
+                    "measured_value": 0.862,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 9,
+                    "description": "VDD_1V1",
+                    "target_value": 0.92,
+                    "lower_limit": 0.72,
+                    "upper_limit": 1.02,
+                    "measured_value": 0.928,
+                    "conclusion": "Pass"
+                },
+                {
+                    "test_number": 10,
+                    "description": "SDA",
+                    "target_value": 0.73,
+                    "lower_limit": 0.53,
+                    "upper_limit": 0.93,
+                    "measured_value": 0.545,
+                    "conclusion": "Pass"
+                }
+            ]
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241011_111803",
+            "red_tag_message": "Short circuit under the BGA U1 IC."
+        },
+        {
+            "timestamp": "20241011_111828",
+            "red_tag_message": "Ms Than says the repair is more difficult than it's worth."
+        }
+    ]
+}
