@@ -384,17 +384,23 @@ class TestLauncher(QMainWindow):
     def load_report(self):
         """Load the report corresponding to the entered barcode or show all files if blank."""
         barcode = self.barcode_input.text().strip()
-        if not barcode:
-            self.file_list_widget.clear()
-            reports_dir = os.path.join(self.parent_dir, 'testing_hub', 'reports')
-            report_files = [f for f in os.listdir(reports_dir) if f.endswith('.json')]
+        reports_dir = os.path.join(self.parent_dir, 'testing_hub', 'reports')
 
+        if not barcode:
+            # Clear the file list widget before loading the reports
+            self.file_list_widget.clear()
+
+            # Retrieve and sort the report files by name
+            report_files = sorted([f for f in os.listdir(reports_dir) if f.endswith('.json')])
+
+            # Add sorted report files to the list widget
             for report_file in report_files:
                 item = QListWidgetItem(report_file)
                 with open(os.path.join(reports_dir, report_file), 'r') as file:
                     report_content = json.load(file)
                     overall_status = report_content.get("test_reports", [{}])[0].get("overall_status", "Fail")
 
+                # Set the background color based on pass/fail status
                 if overall_status == "Pass":
                     item.setBackground(Qt.darkGreen)
                     item.setForeground(Qt.white)
@@ -403,13 +409,16 @@ class TestLauncher(QMainWindow):
                     item.setForeground(Qt.white)
 
                 self.file_list_widget.addItem(item)
+
+            # Clear previous report displays
             self.report_display.clear()
             self.red_tag_display.clear()
             self.process_flow_display.clear()
         else:
+            # If a barcode is provided, attempt to load the specific report
             board_name, board_rev, board_var, board_sn = parse_pcb_barcode(barcode)
             report_file_name = f"{board_name}-{board_rev}-{board_var}-{board_sn}.json"
-            report_file_path = os.path.join(self.parent_dir, 'testing_hub', 'reports', report_file_name)
+            report_file_path = os.path.join(reports_dir, report_file_name)
 
             if os.path.exists(report_file_path):
                 with open(report_file_path, 'r') as file:
@@ -420,6 +429,7 @@ class TestLauncher(QMainWindow):
                 self.file_list_widget.clear()
             else:
                 QMessageBox.warning(self, "Error", "Report not found.")
+
 
     def open_selected_file(self, item):
         """Open the selected report file from the list and populate the sub-tabs."""
