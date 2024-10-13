@@ -115,6 +115,11 @@ class TestLauncher(QMainWindow):
         manage_config_action.triggered.connect(self.open_config_manager)
         file_menu.addAction(manage_config_action)  # Add to File menu
 
+        # Add "Update System" option that will trigger git_pull
+        update_action = QAction("Update System", self)
+        update_action.triggered.connect(self.git_pull)  # Connect to git_pull method
+        file_menu.addAction(update_action)  # Add to File menu
+
         # Exit action
         exit_action = QAction("Exit", self)
         exit_action.triggered.connect(self.close)
