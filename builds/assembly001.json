@@ -1,14 +1,2 @@
 {
-    "assembly_id": "assembly001",
-    "profile": "profile001",
-    "components": [
-        {
-            "serial_number": "ABC123",
-            "status": "active"
-        },
-        {
-            "serial_number": "XYZ456",
-            "status": "active"
-        }
-    ]
 }

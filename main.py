@@ -20,6 +20,7 @@ try:
         QRadioButton, QButtonGroup, QDialogButtonBox
     )
     from PyQt5.QtCore import QThread, pyqtSignal, Qt
+    from PyQt5.QtGui import QIcon
 except ImportError:
     print("PyQt5 is not installed. Installing now...")
     ensure_pyqt_installed()
@@ -65,8 +66,10 @@ class TestLauncher(QMainWindow):
         super().__init__()
         self.parent_dir = parent_dir
         self.script_mapping = {}
-        self.messages = {}  # Initialize messages as empty
-        self.load_messages()  # Load messages during initialization
+        self.messages = {}
+        self.load_messages()
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.setWindowIcon(QIcon(os.path.join(current_dir, 'icon.png')))
         self.initUI()
 
     def initUI(self):
@@ -470,7 +473,7 @@ class messagesDialog(QDialog):
     def __init__(self, messages_file):
         super().__init__()
         self.messages_file = messages_file
-        self.setWindowTitle("messages")
+        self.setWindowTitle("Message Manager")
         self.setMinimumSize(800, 600)  # Set minimum size to 800x600
 
         # Create the tab widget
@@ -707,7 +710,7 @@ class ConfigManagerDialog(QDialog):
 
         # Add tabs to the tab widget
         self.tab_widget.addTab(self.items_tab, "Items")
-        self.tab_widget.addTab(self.assemblies_tab, "assemblies")
+        self.tab_widget.addTab(self.assemblies_tab, "Assemblies")
 
         # Create the main layout and add the tab widget
         layout = QVBoxLayout()

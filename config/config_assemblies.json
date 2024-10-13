@@ -1,26 +1,8 @@
 {
-    "profiles": [
+    "assemblies": [
         {
-            "id": "ID",
-            "name": "Name",
-            "items": [
-                "ID - Name (Type)"
-            ],
-            "description": "Description"
-        },
-        {
-            "id": "CameraStack_Gen3.4",
-            "name": "camera stack",
-            "items": [
-                "sense_imx565-0020 - sense_imx565 (PCB)",
-                "imx2cc-0020 - imx2cc (PCB)",
-                "camctrlg4-0020 - camctrlg4 (PCB)"
-            ],
-            "description": ""
-        },
-        {
-            "id": "Head_Gen3.4",
-            "name": "Head",
+            "id": "Eye",
+            "name": "Camera Assembly",
             "items": [
                 "pt_tlxx-0012 - pt_tlxx (PCB)",
                 "sense_imx565-0020 - sense_imx565 (PCB)",
