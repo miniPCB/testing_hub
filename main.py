@@ -65,8 +65,8 @@ class TestLauncher(QMainWindow):
         super().__init__()
         self.parent_dir = parent_dir
         self.script_mapping = {}
-        self.settings = {}  # Initialize settings as empty
-        self.load_settings()  # Load settings during initialization
+        self.messages = {}  # Initialize messages as empty
+        self.load_messages()  # Load messages during initialization
         self.initUI()
 
     def initUI(self):
@@ -101,10 +101,10 @@ class TestLauncher(QMainWindow):
         # File menu
         file_menu = menu_bar.addMenu("File")
 
-        # Settings action
-        settings_action = QAction("Manage Messages", self)
-        settings_action.triggered.connect(self.open_settings_dialog)
-        file_menu.addAction(settings_action)
+        # messages action
+        messages_action = QAction("Manage Messages", self)
+        messages_action.triggered.connect(self.open_messages_dialog)
+        file_menu.addAction(messages_action)
 
         # Manage Configurations action (moved from Configuration menu to File menu)
         manage_config_action = QAction("Manage Configurations", self)
@@ -141,12 +141,12 @@ class TestLauncher(QMainWindow):
 
 
     def apply_process_message(self):
-        # Ensure settings are loaded
-        if not hasattr(self, 'settings') or not self.settings:
-            self.load_settings()  # Load settings if they haven't been loaded yet
+        # Ensure messages are loaded
+        if not hasattr(self, 'messages') or not self.messages:
+            self.load_messages()  # Load messages if they haven't been loaded yet
 
-        # Retrieve process messages from the settings
-        messages = self.settings.get("process_messages", [])
+        # Retrieve process messages from the messages
+        messages = self.messages.get("process_messages", [])
         
         if not messages:
             QMessageBox.warning(self, "No Messages", "No process messages are available to apply.")
@@ -161,12 +161,12 @@ class TestLauncher(QMainWindow):
             barcode_dialog.exec_()
 
     def apply_red_tag_message(self):
-        # Ensure settings are loaded
-        if not hasattr(self, 'settings') or not self.settings:
-            self.load_settings()  # Load settings if they haven't been loaded yet
+        # Ensure messages are loaded
+        if not hasattr(self, 'messages') or not self.messages:
+            self.load_messages()  # Load messages if they haven't been loaded yet
 
-        # Retrieve red tag messages from the settings
-        messages = self.settings.get("red_tag_messages", [])
+        # Retrieve red tag messages from the messages
+        messages = self.messages.get("red_tag_messages", [])
         
         if not messages:
             QMessageBox.warning(self, "No Messages", "No red tag messages are available to apply.")
@@ -180,26 +180,26 @@ class TestLauncher(QMainWindow):
             barcode_dialog = BarcodeProcessingDialog(dialog.selected_message, "Red Tag")
             barcode_dialog.exec_()
 
-    def load_settings(self):
-        """Loads settings from the JSON file."""
+    def load_messages(self):
+        """Loads messages from the JSON file."""
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        settings_file = os.path.join(current_dir, 'config', 'settings.json')
+        messages_file = os.path.join(current_dir, 'config', 'messages.json')
         try:
-            with open(settings_file, 'r') as file:
-                self.settings = json.load(file)
-                print("Settings loaded successfully:", self.settings)
+            with open(messages_file, 'r') as file:
+                self.messages = json.load(file)
+                print("messages loaded successfully:", self.messages)
         except (FileNotFoundError, json.JSONDecodeError):
-            self.settings = {}
-            print(f"Failed to load settings or {settings_file} not found.")
+            self.messages = {}
+            print(f"Failed to load messages or {messages_file} not found.")
 
     def stop_barcode_processing(self):
         QMessageBox.information(self, "Process Stopped", "Stopped applying messages to scanned barcodes.")
 
-    def open_settings_dialog(self):
-        """Opens the settings dialog."""
+    def open_messages_dialog(self):
+        """Opens the messages dialog."""
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        settings_file = os.path.join(current_dir, 'config', 'settings.json')
-        dialog = SettingsDialog(settings_file)
+        messages_file = os.path.join(current_dir, 'config', 'messages.json')
+        dialog = messagesDialog(messages_file)
         dialog.exec_()  # Open the dialog modally
 
     def setup_testing_tab(self):
@@ -466,18 +466,18 @@ class TestLauncher(QMainWindow):
         self.runner.error_signal.connect(self.append_output)
         self.runner.start()
 
-class SettingsDialog(QDialog):
-    def __init__(self, settings_file):
+class messagesDialog(QDialog):
+    def __init__(self, messages_file):
         super().__init__()
-        self.settings_file = settings_file
-        self.setWindowTitle("Settings")
+        self.messages_file = messages_file
+        self.setWindowTitle("messages")
         self.setMinimumSize(800, 600)  # Set minimum size to 800x600
 
         # Create the tab widget
         self.tab_widget = QTabWidget()
 
-        # Load the settings from the JSON file
-        self.settings = self.load_settings()
+        # Load the messages from the JSON file
+        self.messages = self.load_messages()
 
         # Process Messages tab
         self.process_messages_tab = QWidget()
@@ -497,29 +497,29 @@ class SettingsDialog(QDialog):
 
         # Add save button
         save_button = QPushButton("Save", self)
-        save_button.clicked.connect(self.save_settings)
+        save_button.clicked.connect(self.save_messages)
         layout.addWidget(save_button)
 
         # Set layout
         self.setLayout(layout)
 
-    def load_settings(self):
-        """Loads settings from the JSON file."""
+    def load_messages(self):
+        """Loads messages from the JSON file."""
         try:
-            with open(self.settings_file, 'r') as file:
+            with open(self.messages_file, 'r') as file:
                 return json.load(file)
         except FileNotFoundError:
             return {}
         except json.JSONDecodeError:
             return {}
 
-    def save_settings(self):
-        """Saves the settings to the JSON file."""
+    def save_messages(self):
+        """Saves the messages to the JSON file."""
         try:
-            with open(self.settings_file, 'w') as file:
-                json.dump(self.settings, file, indent=4)
+            with open(self.messages_file, 'w') as file:
+                json.dump(self.messages, file, indent=4)
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to save settings: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Failed to save messages: {str(e)}")
 
     def setup_process_messages_tab(self):
         """Sets up the Process Messages tab."""
@@ -538,7 +538,7 @@ class SettingsDialog(QDialog):
         # Create a QTreeWidget to display process messages
         self.process_message_tree = QTreeWidget()
         self.process_message_tree.setHeaderLabels(["", "Process Message"])
-        for message in self.settings.get("process_messages", []):
+        for message in self.messages.get("process_messages", []):
             item = QTreeWidgetItem(self.process_message_tree)
             item.setText(1, message)
             item.setCheckState(0, Qt.Unchecked)
@@ -568,7 +568,7 @@ class SettingsDialog(QDialog):
         # Create a QTreeWidget to display red tag messages
         self.red_tag_message_tree = QTreeWidget()
         self.red_tag_message_tree.setHeaderLabels(["", "Red Tag Message"])
-        for message in self.settings.get("red_tag_messages", []):
+        for message in self.messages.get("red_tag_messages", []):
             item = QTreeWidgetItem(self.red_tag_message_tree)
             item.setText(1, message)
             item.setCheckState(0, Qt.Unchecked)
@@ -588,7 +588,7 @@ class SettingsDialog(QDialog):
             item = QTreeWidgetItem(self.process_message_tree)
             item.setText(1, message)
             item.setCheckState(0, Qt.Unchecked)
-            self.settings.setdefault("process_messages", []).append(message)
+            self.messages.setdefault("process_messages", []).append(message)
             self.process_message_input.clear()
 
     def remove_process_message(self):
@@ -599,8 +599,8 @@ class SettingsDialog(QDialog):
             if item.checkState(0) == Qt.Checked:
                 # Remove from the tree widget
                 self.process_message_tree.takeTopLevelItem(index)
-                # Remove from the settings
-                self.settings["process_messages"].remove(item.text(1))
+                # Remove from the messages
+                self.messages["process_messages"].remove(item.text(1))
 
     def add_red_tag_message(self):
         """Adds a new red tag message."""
@@ -609,7 +609,7 @@ class SettingsDialog(QDialog):
             item = QTreeWidgetItem(self.red_tag_message_tree)
             item.setText(1, message)
             item.setCheckState(0, Qt.Unchecked)
-            self.settings.setdefault("red_tag_messages", []).append(message)
+            self.messages.setdefault("red_tag_messages", []).append(message)
             self.red_tag_message_input.clear()
 
     def remove_red_tag_message(self):
@@ -620,8 +620,8 @@ class SettingsDialog(QDialog):
             if item.checkState(0) == Qt.Checked:
                 # Remove from the tree widget
                 self.red_tag_message_tree.takeTopLevelItem(index)
-                # Remove from the settings
-                self.settings["red_tag_messages"].remove(item.text(1))
+                # Remove from the messages
+                self.messages["red_tag_messages"].remove(item.text(1))
 
 class ApplyMessageDialog(QDialog):
     def __init__(self, messages, message_type):
