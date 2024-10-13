@@ -239,7 +239,7 @@ def process_flow_json_to_html(process_flow_data):
     """
 
     for message in process_flow_messages:
-        timestamp = message.get("timestamp", "N/A")
+        timestamp = message.get("datetime", "N/A")
         process_flow_message = message.get("process_flow_message", "No message available")
 
         html += f"""

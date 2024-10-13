@@ -265,15 +265,26 @@ class TestLauncher(QMainWindow):
             barcode_dialog.exec_()
 
     def load_messages(self):
-        """Loads messages from the JSON file."""
+        """Loads both process and red tag messages from the JSON file."""
         current_dir = os.path.dirname(os.path.abspath(__file__))
         messages_file = os.path.join(current_dir, 'config', 'messages.json')
         try:
             with open(messages_file, 'r') as file:
                 self.messages = json.load(file)
+            
+            # Ensure both types of messages are initialized
+            if "process_messages" not in self.messages:
+                self.messages["process_messages"] = []
+            
+            if "red_tag_messages" not in self.messages:
+                self.messages["red_tag_messages"] = []
+
         except (FileNotFoundError, json.JSONDecodeError):
-            self.messages = {}
-            print(f"Failed to load messages or {messages_file} not found.")
+            self.messages = {
+                "process_messages": [],
+                "red_tag_messages": []
+            }
+            print(f"Failed to load messages or {messages_file} not found. Initialized empty message sets.")
 
     def stop_barcode_processing(self):
         QMessageBox.information(self, "Process Stopped", "Stopped applying messages to scanned barcodes.")
@@ -397,12 +408,75 @@ class TestLauncher(QMainWindow):
         self.reports_display_tab.setLayout(layout)
 
     def setup_process_flow_tab(self):
-        """Sets up the Process Flow tab UI."""
+        """Sets up the Process Flow tab UI with HTML table, images, and an Add Message button."""
         layout = QVBoxLayout()
+
+        # Path to the img folder for icons
+        img_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'img')
+
+        # Example of mapping messages to icon names (can be customized)
+        icon_mapping = {
+            "Applied Barcode": "01-applied_barcode.png",
+            "EEPROM Programmed": "02-eeprom_programming.png",
+            "Received by Production": "03-received_by_production.png",
+            "Rejected by Production": "04-rejected_by_production.png",
+            "Given to Engineer": "05-given_to_engineer.png"
+        }
+
+        # Create an HTML table
+        self.html_content = "<table border='1' cellpadding='10' cellspacing='0'>"
+        
+        for message in self.messages.get("process_messages", []):
+            # Get the icon name from the mapping or use a default icon
+            icon_name = icon_mapping.get(message, "default_icon.png")
+            icon_path = os.path.join(img_folder, icon_name)
+
+            # Generate the table row with the image in the left column and message in the right column
+            self.html_content += f"""
+            <tr>
+                <td><img src='{icon_path}' alt='Icon' width='64' height='64'></td>
+                <td>{message}</td>
+            </tr>
+            """
+        
+        self.html_content += "</table>"
+
+        # Set the HTML content to the process_flow_display
         self.process_flow_display = QTextEdit()
         self.process_flow_display.setReadOnly(True)
+        self.process_flow_display.setHtml(self.html_content)
+
         layout.addWidget(self.process_flow_display)
+
+        # Add the "Add Message" button
+        add_message_button = QPushButton("Add Message")
+        add_message_button.clicked.connect(self.open_add_message_dialog)  # Connect to the dialog
+        layout.addWidget(add_message_button)
+
         self.process_flow_tab.setLayout(layout)
+
+    def open_add_message_dialog(self):
+        """Opens the Add Message dialog."""
+        available_messages = self.messages.get("process_messages", [])
+        
+        # If no messages are available, show a warning
+        if not available_messages:
+            QMessageBox.warning(self, "No Messages", "No process messages are available to select.")
+            return
+        
+        # Create the AddMessageDialog and pass the available messages
+        dialog = AddMessageDialog(available_messages)
+        
+        if dialog.exec_() == QDialog.Accepted:
+            selected_message = dialog.selected_message
+            
+            # Check if a message was selected
+            if selected_message:
+                # Add the selected message to the process flow
+                self.add_message_to_process_flow(selected_message)
+                print(f"Message added: {selected_message}")  # Debugging output to verify the message is being added
+            else:
+                QMessageBox.warning(self, "No Message Selected", "Please select a message to add.")
 
     def setup_red_tag_messages_tab(self):
         """Sets up the Red Tag Messages tab UI."""
@@ -521,10 +595,13 @@ class TestLauncher(QMainWindow):
                 report_content = json.load(file)
             self.report_display.setHtml(report_json_to_html(report_content))
             self.red_tag_display.setHtml(red_tag_messages_json_to_html(report_content))
-            self.process_flow_display.setHtml(process_flow_json_to_html(report_content))
             self.last_opened_file = file_path
+
+            # Load the process flow messages
+            self.load_process_flow()
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to open report: {str(e)}")
+
 
     def git_pull(self):
         """Function to run git fetch and then git pull command."""
@@ -560,6 +637,69 @@ class TestLauncher(QMainWindow):
         self.runner.output_signal.connect(self.append_output)
         self.runner.error_signal.connect(self.append_output)
         self.runner.start()
+
+    def add_message_to_process_flow(self, message):
+        """Adds the selected message to the process flow and logs it."""
+        # Log the message to the JSON report file
+        self.log_message_to_report(message)
+
+        # Reload the process flow from the report file to update the display
+        self.load_process_flow()
+
+    def log_message_to_report(self, message):
+        """Logs the message with datetime to the appropriate JSON report file."""
+        if not hasattr(self, 'last_opened_file') or not self.last_opened_file:
+            QMessageBox.warning(self, "Error", "No report file is currently open.")
+            return
+
+        report_file = self.last_opened_file
+
+        try:
+            # Load the existing report content from the JSON file
+            with open(report_file, 'r') as file:
+                report_content = json.load(file)
+
+            # Ensure there is a "process_flow_messages" section in the report
+            if "process_flow_messages" not in report_content:
+                report_content["process_flow_messages"] = []
+
+            # Append the new message to the process flow section
+            new_entry = {
+                "datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "process_flow_message": message
+            }
+            report_content["process_flow_messages"].append(new_entry)
+
+            # Save the updated report content back to the JSON file
+            with open(report_file, 'w') as file:
+                json.dump(report_content, file, indent=4)
+
+            print(f"Successfully logged the message to the report: {report_file}")
+            print(f"Logged entry: {new_entry}")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to log message to the report: {str(e)}")
+
+
+    def load_process_flow(self):
+        """Loads the process flow from the report file and updates the display."""
+        if not hasattr(self, 'last_opened_file') or not self.last_opened_file:
+            QMessageBox.warning(self, "Error", "No report file is currently open.")
+            return
+        
+        try:
+            with open(self.last_opened_file, 'r') as file:
+                report_content = json.load(file)
+            
+            # Generate HTML from the process flow messages
+            process_flow_html = process_flow_json_to_html(report_content)
+            
+            # Update the display
+            self.process_flow_display.setHtml(process_flow_html)
+
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to load process flow: {str(e)}")
+
 
 class messagesDialog(QDialog):
     def __init__(self, messages_file):
@@ -787,13 +927,16 @@ class ApplyMessageDialog(QDialog):
         self.setLayout(layout)
 
     def apply_message(self):
-        # Get the selected message
+        """Set the selected message and accept the dialog."""
         selected_button = self.button_group.checkedButton()
         if selected_button:
             self.selected_message = selected_button.text()
+            print(f"Selected message in dialog: {self.selected_message}")  # Debugging output
             self.accept()
         else:
-            QMessageBox.warning(self, "No Selection", f"No {self.message_type} message selected.")
+            print("No message selected in dialog.")  # Debugging output
+            QMessageBox.warning(self, "No Selection", "Please select a message to apply.")
+
 
 class BarcodeProcessingDialog(QDialog):
     stop_signal = pyqtSignal()
@@ -1121,6 +1264,52 @@ class ProfileDialog(QDialog):
     def get_profile(self):
         """Returns the profile data."""
         return self.profile_data
+
+class AddMessageDialog(QDialog):
+    def __init__(self, messages):
+        super().__init__()
+        self.setWindowTitle("Apply Process Message")
+        self.selected_message = None
+
+        # Create the layout
+        layout = QVBoxLayout()
+
+        # Add a label to guide the user
+        label = QLabel("Select a process message:")
+        layout.addWidget(label)
+
+        # Create a group of radio buttons for the messages
+        self.button_group = QButtonGroup(self)
+        for i, message in enumerate(messages):
+            radio_button = QRadioButton(message)
+            self.button_group.addButton(radio_button, i)
+            layout.addWidget(radio_button)
+
+        # Create Apply and Cancel buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.Apply | QDialogButtonBox.Cancel)
+
+        # Manually connect the Apply button to the apply_message method
+        apply_button = button_box.button(QDialogButtonBox.Apply)
+        apply_button.clicked.connect(self.apply_message)
+
+        # Connect the Cancel button to reject the dialog
+        button_box.rejected.connect(self.reject)
+
+        layout.addWidget(button_box)
+
+        self.setLayout(layout)
+
+    def apply_message(self):
+        """Set the selected message and accept the dialog."""
+        selected_button = self.button_group.checkedButton()
+        if selected_button:
+            self.selected_message = selected_button.text()
+            print(f"Selected message in dialog: {self.selected_message}")  # Debugging output
+            self.accept()
+        else:
+            print("No message selected in dialog.")  # Debugging output
+            QMessageBox.warning(self, "No Selection", "Please select a message to apply.")
+
 
 if __name__ == "__main__":
     parent_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
