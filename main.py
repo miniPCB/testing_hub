@@ -76,9 +76,28 @@ class TestLauncher(QMainWindow):
         self.git_pull()
         current_dir = os.path.dirname(os.path.abspath(__file__))
         self.setWindowIcon(QIcon(os.path.join(current_dir, 'icon.png')))
+
+        # Check if Waveforms is installed
+        if not self.is_waveforms_installed():
+            QMessageBox.critical(self, "Missing Dependency", 
+                                 "Waveforms is not installed. Please install Waveforms to continue.")
+            sys.exit(1)  # Exit the application if Waveforms is not installed
+
         self.load_messages()
         self.initUI()
-        
+
+    def is_waveforms_installed(self):
+        """Checks if Waveforms is installed on the system."""
+        try:
+            # Try to run Waveforms on Linux or Windows to check if it's installed
+            if sys.platform.startswith('linux'):
+                subprocess.run(["which", "waveforms"], check=True)
+            elif sys.platform.startswith('win'):
+                subprocess.run(["where", "waveforms"], check=True)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
     def initUI(self):
         self.setWindowTitle("Testing Hub")
         self.setMinimumSize(1400, 900)
