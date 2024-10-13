@@ -211,12 +211,8 @@
             "process_flow_message": "Applied Barcode"
         },
         {
-            "datetime": "2024-10-13 17:41:25",
-            "process_flow_message": "EEPROM Programmed"
-        },
-        {
-            "datetime": "2024-10-13 17:55:53",
-            "process_flow_message": "Received by Production"
+            "datetime": "2024-10-13 18:26:58",
+            "process_flow_message": "Rejected by Production"
         }
     ]
 }

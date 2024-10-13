@@ -100,8 +100,8 @@
     ],
     "process_flow_messages": [
         {
-            "datetime": "2024-10-13 17:48:53",
-            "message": "2024-10-13 17:48:53 - Applied Barcode"
+            "datetime": "2024-10-13 18:27:11",
+            "process_flow_message": "Applied Barcode"
         }
     ],
     "red_tag_messages": []
