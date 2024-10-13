@@ -1,0 +1,39 @@
+{
+    "items": [
+        {
+            "id": "ID",
+            "name": "Name",
+            "type": "Type",
+            "version": "Version",
+            "description": "Description"
+        },
+        {
+            "id": "pt_tlxx-0012",
+            "name": "pt_tlxx",
+            "type": "PCB",
+            "version": "0012",
+            "description": ""
+        },
+        {
+            "id": "sense_imx565-0020",
+            "name": "sense_imx565",
+            "type": "PCB",
+            "version": "0020",
+            "description": ""
+        },
+        {
+            "id": "imx2cc-0020",
+            "name": "imx2cc",
+            "type": "PCB",
+            "version": "0020",
+            "description": ""
+        },
+        {
+            "id": "camctrlg4-0020",
+            "name": "camctrlg4",
+            "type": "PCB",
+            "version": "0020",
+            "description": ""
+        }
+    ]
+}

@@ -1,11 +1,16 @@
 {
     "process_messages": [
-        "New message",
-        "New second message"
+        "Applied Barcode",
+        "EEPROM Programmed",
+        "Received by Production",
+        "Rejected by Production",
+        "Given to Engineer"
     ],
     "red_tag_messages": [
         "3V3 SHORT, BGA",
-        "3V3 SHORT, NOT BGA"
+        "3V3 SHORT, NOT BGA",
+        "1V1 SHORT",
+        "1V1 OPEN"
     ],
     "username": "NManteufel",
     "theme": "light",

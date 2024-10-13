@@ -65,6 +65,8 @@ class TestLauncher(QMainWindow):
         super().__init__()
         self.parent_dir = parent_dir
         self.script_mapping = {}
+        self.settings = {}  # Initialize settings as empty
+        self.load_settings()  # Load settings during initialization
         self.initUI()
 
     def initUI(self):
@@ -100,9 +102,14 @@ class TestLauncher(QMainWindow):
         file_menu = menu_bar.addMenu("File")
 
         # Settings action
-        settings_action = QAction("Settings", self)
+        settings_action = QAction("Manage Messages", self)
         settings_action.triggered.connect(self.open_settings_dialog)
         file_menu.addAction(settings_action)
+
+        # Manage Configurations action (moved from Configuration menu to File menu)
+        manage_config_action = QAction("Manage Configurations", self)
+        manage_config_action.triggered.connect(self.open_config_manager)
+        file_menu.addAction(manage_config_action)  # Add to File menu
 
         # Exit action
         exit_action = QAction("Exit", self)
@@ -121,6 +128,17 @@ class TestLauncher(QMainWindow):
         apply_red_tag_message_action = QAction("Apply Red Tag Message", self)
         apply_red_tag_message_action.triggered.connect(self.apply_red_tag_message)
         actions_menu.addAction(apply_red_tag_message_action)
+
+        # Build Assembly action
+        build_assembly_action = QAction("Build Assembly", self)
+        #build_assembly_action.triggered.connect(self.build_assembly)
+        actions_menu.addAction(build_assembly_action)
+
+    def open_config_manager(self):
+        """Opens the configuration management dialog."""
+        config_dialog = ConfigManagerDialog(self.parent_dir)
+        config_dialog.exec_()  # Open the dialog modally
+
 
     def apply_process_message(self):
         # Ensure settings are loaded
@@ -164,12 +182,15 @@ class TestLauncher(QMainWindow):
 
     def load_settings(self):
         """Loads settings from the JSON file."""
-        settings_file = os.path.join(self.parent_dir, 'config', 'settings.json')
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        settings_file = os.path.join(current_dir, 'config', 'settings.json')
         try:
             with open(settings_file, 'r') as file:
                 self.settings = json.load(file)
+                print("Settings loaded successfully:", self.settings)
         except (FileNotFoundError, json.JSONDecodeError):
             self.settings = {}
+            print(f"Failed to load settings or {settings_file} not found.")
 
     def stop_barcode_processing(self):
         QMessageBox.information(self, "Process Stopped", "Stopped applying messages to scanned barcodes.")
@@ -177,7 +198,7 @@ class TestLauncher(QMainWindow):
     def open_settings_dialog(self):
         """Opens the settings dialog."""
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        settings_file = os.path.join(current_dir, 'config', 'settings.json')  # Path to settings.json in the config folder
+        settings_file = os.path.join(current_dir, 'config', 'settings.json')
         dialog = SettingsDialog(settings_file)
         dialog.exec_()  # Open the dialog modally
 
@@ -458,10 +479,6 @@ class SettingsDialog(QDialog):
         # Load the settings from the JSON file
         self.settings = self.load_settings()
 
-        # Legacy tab
-        self.legacy_tab = QWidget()
-        self.setup_legacy_tab()
-
         # Process Messages tab
         self.process_messages_tab = QWidget()
         self.setup_process_messages_tab()
@@ -471,7 +488,6 @@ class SettingsDialog(QDialog):
         self.setup_red_tag_messages_tab()
 
         # Add tabs to the tab widget
-        self.tab_widget.addTab(self.legacy_tab, "Legacy")
         self.tab_widget.addTab(self.process_messages_tab, "Process Messages")
         self.tab_widget.addTab(self.red_tag_messages_tab, "Red Tag Messages")
 
@@ -504,19 +520,6 @@ class SettingsDialog(QDialog):
                 json.dump(self.settings, file, indent=4)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save settings: {str(e)}")
-
-    def setup_legacy_tab(self):
-        """Sets up the Legacy tab."""
-        layout = QVBoxLayout()
-        for key, value in self.settings.get("legacy", {}).items():
-            field_layout = QHBoxLayout()
-            label = QLabel(key)
-            field = QLineEdit(str(value))
-            self.settings["legacy"][key] = field
-            field_layout.addWidget(label)
-            field_layout.addWidget(field)
-            layout.addLayout(field_layout)
-        self.legacy_tab.setLayout(layout)
 
     def setup_process_messages_tab(self):
         """Sets up the Process Messages tab."""
@@ -631,7 +634,7 @@ class ApplyMessageDialog(QDialog):
         layout = QVBoxLayout()
 
         # Add a title for the dialog
-        label = QLabel(f"Select {message_type} Message to Apply:")
+        label = QLabel(f"Restart application for latest messages:")
         layout.addWidget(label)
 
         # Create a group of radio buttons for the messages
@@ -679,6 +682,310 @@ class BarcodeProcessingDialog(QDialog):
     def stop_processing(self):
         self.stop_signal.emit()  # Emit the stop signal
         self.accept()  # Close the dialog
+
+class ConfigManagerDialog(QDialog):
+    def __init__(self, parent_dir):
+        super().__init__()
+        self.parent_dir = parent_dir
+        self.setWindowTitle("Configuration Manager")
+        self.setMinimumSize(800, 600)
+
+        # Load items and assemblies
+        self.config_items = self.load_json_file('config_items.json', 'items')
+        self.config_assemblies = self.load_json_file('config_assemblies.json', 'assemblies')
+
+        # Create a tab widget
+        self.tab_widget = QTabWidget()
+
+        # Create Items tab
+        self.items_tab = QWidget()
+        self.setup_items_tab()
+
+        # Create assemblies tab
+        self.assemblies_tab = QWidget()
+        self.setup_assemblies_tab()
+
+        # Add tabs to the tab widget
+        self.tab_widget.addTab(self.items_tab, "Items")
+        self.tab_widget.addTab(self.assemblies_tab, "assemblies")
+
+        # Create the main layout and add the tab widget
+        layout = QVBoxLayout()
+        layout.addWidget(self.tab_widget)
+
+        # Add Save and Close buttons
+        button_layout = QHBoxLayout()
+        save_button = QPushButton("Save")
+        save_button.clicked.connect(self.save_configurations)
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(self.close)
+        button_layout.addWidget(save_button)
+        button_layout.addWidget(close_button)
+
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+
+    def load_json_file(self, filename, key):
+        """Helper function to load items or assemblies from a JSON file."""
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, 'config', filename)
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+            return data.get(key, [])
+        except FileNotFoundError:
+            return []
+        except json.JSONDecodeError:
+            return []
+
+    def setup_items_tab(self):
+        """Sets up the UI for managing config items."""
+        layout = QVBoxLayout()
+
+        # List to display items
+        self.items_list = QListWidget()
+        for item in self.config_items:
+            self.items_list.addItem(f"{item['id']} - {item['name']} ({item['type']})")
+        layout.addWidget(self.items_list)
+
+        # Add, Edit, and Remove buttons for items
+        button_layout = QHBoxLayout()
+        add_button = QPushButton("Add Item")
+        add_button.clicked.connect(self.add_item)
+
+        edit_button = QPushButton("Edit Item")  # Create the edit button
+        edit_button.clicked.connect(self.edit_item)  # Connect to edit_item method
+
+        remove_button = QPushButton("Remove Item")
+        remove_button.clicked.connect(self.remove_item)
+
+        # Add the buttons to the layout
+        button_layout.addWidget(add_button)
+        button_layout.addWidget(edit_button)
+        button_layout.addWidget(remove_button)
+        layout.addLayout(button_layout)
+
+        self.items_tab.setLayout(layout)
+
+    def setup_assemblies_tab(self):
+        """Sets up the UI for managing config assemblies."""
+        layout = QVBoxLayout()
+
+        # List to display assemblies
+        self.assemblies_list = QListWidget()
+        for profile in self.config_assemblies:
+            self.assemblies_list.addItem(f"{profile['id']} - {profile['name']}")
+        layout.addWidget(self.assemblies_list)
+
+        # Add, Edit, and Remove buttons for assemblies
+        button_layout = QHBoxLayout()
+        add_button = QPushButton("Add Profile")
+        add_button.clicked.connect(self.add_profile)
+
+        edit_button = QPushButton("Edit Profile")  # Create the edit button
+        edit_button.clicked.connect(self.edit_profile)  # Connect to edit_profile method
+
+        remove_button = QPushButton("Remove Profile")
+        remove_button.clicked.connect(self.remove_profile)
+
+        # Add the buttons to the layout
+        button_layout.addWidget(add_button)
+        button_layout.addWidget(edit_button)
+        button_layout.addWidget(remove_button)
+        layout.addLayout(button_layout)
+
+        self.assemblies_tab.setLayout(layout)
+
+    # Methods to add and edit items and assemblies
+    def add_item(self):
+        """Opens a dialog to add a new config item."""
+        item_dialog = ItemDialog(self.config_items)
+        if item_dialog.exec_() == QDialog.Accepted:
+            new_item = item_dialog.get_item()
+            self.config_items.append(new_item)
+            self.items_list.addItem(f"{new_item['id']} - {new_item['name']} ({new_item['type']})")
+
+    def edit_item(self):
+        """Opens a dialog to edit the selected config item."""
+        selected_item_index = self.items_list.currentRow()
+        if selected_item_index >= 0:
+            selected_item = self.config_items[selected_item_index]
+            item_dialog = ItemDialog(self.config_items, item=selected_item)
+            if item_dialog.exec_() == QDialog.Accepted:
+                updated_item = item_dialog.get_item()
+                self.config_items[selected_item_index] = updated_item
+                self.items_list.item(selected_item_index).setText(f"{updated_item['id']} - {updated_item['name']} ({updated_item['type']})")
+
+    def remove_item(self):
+        """Removes the selected item from the list."""
+        selected_item = self.items_list.currentRow()
+        if selected_item >= 0:
+            self.config_items.pop(selected_item)
+            self.items_list.takeItem(selected_item)
+
+    def add_profile(self):
+        """Opens a dialog to add a new profile."""
+        profile_dialog = ProfileDialog(self.config_assemblies, self.config_items)
+        if profile_dialog.exec_() == QDialog.Accepted:
+            new_profile = profile_dialog.get_profile()
+            self.config_assemblies.append(new_profile)
+            self.assemblies_list.addItem(f"{new_profile['id']} - {new_profile['name']}")
+
+    def edit_profile(self):
+        """Opens a dialog to edit the selected profile."""
+        selected_profile_index = self.assemblies_list.currentRow()
+        if selected_profile_index >= 0:
+            selected_profile = self.config_assemblies[selected_profile_index]
+            profile_dialog = ProfileDialog(self.config_assemblies, self.config_items, profile=selected_profile)
+            if profile_dialog.exec_() == QDialog.Accepted:
+                updated_profile = profile_dialog.get_profile()
+                self.config_assemblies[selected_profile_index] = updated_profile
+                self.assemblies_list.item(selected_profile_index).setText(f"{updated_profile['id']} - {updated_profile['name']}")
+
+    def remove_profile(self):
+        """Removes the selected profile from the list."""
+        selected_profile = self.assemblies_list.currentRow()
+        if selected_profile >= 0:
+            self.config_assemblies.pop(selected_profile)
+            self.assemblies_list.takeItem(selected_profile)
+
+    def save_configurations(self):
+        """Saves the items and assemblies to their respective JSON files."""
+        self.save_json_file('config_items.json', 'items', self.config_items)
+        self.save_json_file('config_assemblies.json', 'assemblies', self.config_assemblies)
+        QMessageBox.information(self, "Saved", "Configuration items and assemblies saved successfully.")
+
+    def save_json_file(self, filename, key, data):
+        """Helper function to save items or assemblies to a JSON file."""
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, 'config', filename)
+        with open(file_path, 'w') as file:
+            json.dump({key: data}, file, indent=4)
+
+
+class ItemDialog(QDialog):
+    def __init__(self, items, item=None):  # Optional item argument for editing
+        super().__init__()
+        self.setWindowTitle("Add or Edit Item")
+        self.items = items
+        self.item_data = {}
+
+        layout = QVBoxLayout()
+
+        # Input fields for item details
+        self.id_input = QLineEdit()
+        self.id_input.setPlaceholderText("Item ID")
+        layout.addWidget(self.id_input)
+
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText("Item Name")
+        layout.addWidget(self.name_input)
+
+        self.type_input = QLineEdit()
+        self.type_input.setPlaceholderText("Item Type")
+        layout.addWidget(self.type_input)
+
+        self.version_input = QLineEdit()
+        self.version_input.setPlaceholderText("Item Version")
+        layout.addWidget(self.version_input)
+
+        self.desc_input = QTextEdit()
+        self.desc_input.setPlaceholderText("Item Description")
+        layout.addWidget(self.desc_input)
+
+        # Pre-fill the fields if editing
+        if item:
+            self.id_input.setText(item['id'])
+            self.name_input.setText(item['name'])
+            self.type_input.setText(item['type'])
+            self.version_input.setText(item['version'])
+            self.desc_input.setText(item['description'])
+
+        # Dialog buttons
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+        self.setLayout(layout)
+
+    def accept(self):
+        """Override accept to capture item data."""
+        self.item_data = {
+            'id': self.id_input.text(),
+            'name': self.name_input.text(),
+            'type': self.type_input.text(),
+            'version': self.version_input.text(),
+            'description': self.desc_input.toPlainText()
+        }
+        super().accept()
+
+    def get_item(self):
+        """Returns the item data."""
+        return self.item_data
+
+class ProfileDialog(QDialog):
+    def __init__(self, assemblies, items, profile=None):  # Optional profile argument for editing
+        super().__init__()
+        self.setWindowTitle("Add or Edit Profile")
+        self.assemblies = assemblies
+        self.items = items
+        self.profile_data = {}
+
+        layout = QVBoxLayout()
+
+        # Input fields for profile details
+        self.id_input = QLineEdit()
+        self.id_input.setPlaceholderText("Profile ID")
+        layout.addWidget(self.id_input)
+
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText("Profile Name")
+        layout.addWidget(self.name_input)
+
+        # Dropdown or list for selecting items to include in the profile
+        self.items_list = QListWidget()
+        self.items_list.setSelectionMode(QListWidget.MultiSelection)
+        for item in self.items:
+            self.items_list.addItem(f"{item['id']} - {item['name']} ({item['type']})")
+        layout.addWidget(self.items_list)
+
+        self.desc_input = QTextEdit()
+        self.desc_input.setPlaceholderText("Profile Description")
+        layout.addWidget(self.desc_input)
+
+        # Pre-fill the fields if editing
+        if profile:
+            self.id_input.setText(profile['id'])
+            self.name_input.setText(profile['name'])
+            # Mark selected items
+            for i in range(self.items_list.count()):
+                item_widget = self.items_list.item(i)
+                if any(selected_item == item_widget.text() for selected_item in profile['items']):
+                    item_widget.setSelected(True)
+
+        # Dialog buttons
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+        self.setLayout(layout)
+
+    def accept(self):
+        """Override accept to capture profile data."""
+        selected_items = [item.text() for item in self.items_list.selectedItems()]
+        self.profile_data = {
+            'id': self.id_input.text(),
+            'name': self.name_input.text(),
+            'items': selected_items,
+            'description': self.desc_input.toPlainText()
+        }
+        super().accept()
+
+    def get_profile(self):
+        """Returns the profile data."""
+        return self.profile_data
 
 if __name__ == "__main__":
     parent_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
