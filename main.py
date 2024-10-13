@@ -164,7 +164,7 @@ class TestLauncher(QMainWindow):
 
     # New method to show author information
     def show_author_info(self):
-        QMessageBox.information(self, "Author", "Author: Nolan Manteufel\nContact: nolan@minipcb.com")
+        QMessageBox.information(self, "Author", "Nolan Manteufel\nnolan@minipcb.com")
 
     def show_system_info(self):
         try:
