@@ -450,8 +450,9 @@ class TestLauncher(QMainWindow):
     def git_pull(self):
         """Function to run git fetch and then git pull command."""
         try:
-            subprocess.check_call(['git', 'fetch'], cwd=self.parent_dir)
-            subprocess.check_call(['git', 'pull'], cwd=self.parent_dir)
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            subprocess.check_call(['git', 'fetch'], cwd=current_dir)
+            subprocess.check_call(['git', 'pull'], cwd=current_dir)
             self.append_output("Successfully pulled from the repository.")
         except subprocess.CalledProcessError as e:
             self.append_output(f"Error during git pull: {e}")
@@ -513,7 +514,6 @@ class messagesDialog(QDialog):
         save_button.clicked.connect(self.save_messages)
         layout.addWidget(save_button)
 
-        # Set layout
         self.setLayout(layout)
 
     def load_messages(self):
@@ -557,11 +557,20 @@ class messagesDialog(QDialog):
             item.setCheckState(0, Qt.Unchecked)
         layout.addWidget(self.process_message_tree)
 
+        # Buttons for Edit and Remove
+        button_layout = QHBoxLayout()
+
+        # Button to edit selected process message
+        edit_button = QPushButton("Edit Selected")
+        edit_button.clicked.connect(self.edit_process_message)
+        button_layout.addWidget(edit_button)
+
         # Button to remove selected process messages
         remove_button = QPushButton("Remove Selected")
         remove_button.clicked.connect(self.remove_process_message)
-        layout.addWidget(remove_button)
+        button_layout.addWidget(remove_button)
 
+        layout.addLayout(button_layout)
         self.process_messages_tab.setLayout(layout)
 
     def setup_red_tag_messages_tab(self):
@@ -587,11 +596,20 @@ class messagesDialog(QDialog):
             item.setCheckState(0, Qt.Unchecked)
         layout.addWidget(self.red_tag_message_tree)
 
+        # Buttons for Edit and Remove
+        button_layout = QHBoxLayout()
+
+        # Button to edit selected red tag message
+        edit_button = QPushButton("Edit Selected")
+        edit_button.clicked.connect(self.edit_red_tag_message)
+        button_layout.addWidget(edit_button)
+
         # Button to remove selected red tag messages
         remove_button = QPushButton("Remove Selected")
         remove_button.clicked.connect(self.remove_red_tag_message)
-        layout.addWidget(remove_button)
+        button_layout.addWidget(remove_button)
 
+        layout.addLayout(button_layout)
         self.red_tag_messages_tab.setLayout(layout)
 
     def add_process_message(self):
@@ -603,6 +621,17 @@ class messagesDialog(QDialog):
             item.setCheckState(0, Qt.Unchecked)
             self.messages.setdefault("process_messages", []).append(message)
             self.process_message_input.clear()
+
+    def edit_process_message(self):
+        """Edits the selected process message."""
+        selected_item = self.process_message_tree.currentItem()
+        if selected_item:
+            current_message = selected_item.text(1)
+            new_message, ok = QInputDialog.getText(self, "Edit Process Message", "Edit message:", QLineEdit.Normal, current_message)
+            if ok and new_message:
+                selected_item.setText(1, new_message)
+                # Update the message in the list
+                self.messages["process_messages"][self.process_message_tree.indexOfTopLevelItem(selected_item)] = new_message
 
     def remove_process_message(self):
         """Removes the selected process messages."""
@@ -625,6 +654,17 @@ class messagesDialog(QDialog):
             self.messages.setdefault("red_tag_messages", []).append(message)
             self.red_tag_message_input.clear()
 
+    def edit_red_tag_message(self):
+        """Edits the selected red tag message."""
+        selected_item = self.red_tag_message_tree.currentItem()
+        if selected_item:
+            current_message = selected_item.text(1)
+            new_message, ok = QInputDialog.getText(self, "Edit Red Tag Message", "Edit message:", QLineEdit.Normal, current_message)
+            if ok and new_message:
+                selected_item.setText(1, new_message)
+                # Update the message in the list
+                self.messages["red_tag_messages"][self.red_tag_message_tree.indexOfTopLevelItem(selected_item)] = new_message
+
     def remove_red_tag_message(self):
         """Removes the selected red tag messages."""
         # Reverse loop to avoid skipping items when removing
@@ -635,6 +675,7 @@ class messagesDialog(QDialog):
                 self.red_tag_message_tree.takeTopLevelItem(index)
                 # Remove from the messages
                 self.messages["red_tag_messages"].remove(item.text(1))
+
 
 class ApplyMessageDialog(QDialog):
     def __init__(self, messages, message_type):
