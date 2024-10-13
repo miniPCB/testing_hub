@@ -14,9 +14,15 @@ https://cloud.digilent.com/myproducts/waveform?pc=1&tab=2&_ga=2.94045657.5387811
    
    For Linux, update your system prior to install. This may take 30 minutes:
    ```bash
-   sudo apt update
-   sudo apt upgrade -y
+   sudo apt-get update
+   sudo apt-get upgrade
+
+   Navigate to the Downloads folder:
+   ```bash
    cd home/pi/downloads
+   
+   Install the deb packages:
+   ```bash
    sudo dpkg -i digilent.adept.runtime_2.27.9-arm64.deb
    sudo dpkg -i digilent.waveforms_3.23.4_arm64.deb
 
