@@ -10,6 +10,17 @@
                 "camctrlg4-0020 - camctrlg4 (PCB)"
             ],
             "description": ""
+        },
+        {
+            "id": "Head",
+            "name": "SOM Assembly",
+            "items": [
+                "bagwell-0000 - TX2 Carrier Board (PCB)",
+                "poe-0000 - Power Over Ethernet Board (PCB)",
+                "camdist-0000 - Camera Distribution Board (PCB)",
+                "tx2-0000 - NVIDIA Jetson TX2  (SOM)"
+            ],
+            "description": ""
         }
     ]
 }

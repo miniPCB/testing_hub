@@ -34,6 +34,34 @@
             "type": "PCB",
             "version": "0020",
             "description": ""
+        },
+        {
+            "id": "bagwell-0000",
+            "name": "TX2 Carrier Board",
+            "type": "PCB",
+            "version": "0000",
+            "description": ""
+        },
+        {
+            "id": "poe-0000",
+            "name": "Power Over Ethernet Board",
+            "type": "PCB",
+            "version": "0000",
+            "description": ""
+        },
+        {
+            "id": "camdist-0000",
+            "name": "Camera Distribution Board",
+            "type": "PCB",
+            "version": "0000",
+            "description": ""
+        },
+        {
+            "id": "tx2-0000",
+            "name": "NVIDIA Jetson TX2 ",
+            "type": "SOM",
+            "version": "0000",
+            "description": ""
         }
     ]
 }
