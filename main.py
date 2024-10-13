@@ -87,10 +87,6 @@ class TestLauncher(QMainWindow):
         self.initUI()
 
     def check_waveforms_installation(self):
-        """
-        Check if WaveForms is installed on the system.
-        Returns True if installed, False otherwise.
-        """
         # Check for Windows installation
         if sys.platform.startswith("win"):
             waveforms_path = r"C:\Program Files (x86)\Digilent\WaveForms3"
@@ -98,7 +94,6 @@ class TestLauncher(QMainWindow):
                 return True
             else:
                 return False
-        
         # Check for Linux installation
         elif sys.platform.startswith("linux"):
             waveforms_path = "/usr/bin/waveforms"  # Modify if your path differs
@@ -106,8 +101,6 @@ class TestLauncher(QMainWindow):
                 return True
             else:
                 return False
-        
-        # If neither Windows nor Linux, assume it's not installed
         return False
 
     def initUI(self):
