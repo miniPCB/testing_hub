@@ -3,7 +3,13 @@ import sys
 import subprocess
 from datetime import datetime
 import json
-from common import ensure_numpy, ensure_pyqt_installed, parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, load_red_tag_messages, add_red_tag_message, save_red_tag_messages
+from common import ensure_psutil, ensure_numpy, ensure_pyqt_installed, parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, load_red_tag_messages, add_red_tag_message, save_red_tag_messages
+
+try:
+    import psutil
+except ImportError:
+    print("PSutil is not installed. Installing now...")
+    ensure_psutil()
 
 try:
     import numpy as np
@@ -142,6 +148,60 @@ class TestLauncher(QMainWindow):
         build_assembly_action = QAction("Build Assembly", self)
         #build_assembly_action.triggered.connect(self.build_assembly)
         actions_menu.addAction(build_assembly_action)
+
+        # About menu
+        about_menu = menu_bar.addMenu("About")
+
+        # About > Author action
+        author_action = QAction("Author", self)
+        author_action.triggered.connect(self.show_author_info)  # Connect to author info method
+        about_menu.addAction(author_action)
+
+        # About > System action
+        system_action = QAction("System", self)
+        system_action.triggered.connect(self.show_system_info)  # Connect to system info method
+        about_menu.addAction(system_action)
+
+    # New method to show author information
+    def show_author_info(self):
+        QMessageBox.information(self, "Author", "Author: Nolan Manteufel\nContact: nolan@minipcb.com")
+
+    def get_directory_size(start_path='.'):
+        """Recursively calculate the size of the directory."""
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(start_path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                total_size += os.path.getsize(fp)
+        return total_size
+
+    def show_system_info(self):
+        try:
+            # Get system memory information
+            memory_info = psutil.virtual_memory()
+            total_memory = round(memory_info.total / (1024 ** 3), 2)  # Convert to GB
+            used_memory = round(memory_info.used / (1024 ** 3), 2)  # Convert to GB
+            free_memory = round(memory_info.available / (1024 ** 3), 2)  # Convert to GB
+
+            # Calculate the size of the current directory and subdirectories
+            directory_size = get_directory_size()  # Defaults to the current directory
+            directory_size_gb = round(directory_size / (1024 ** 3), 2)  # Convert to GB
+
+            # System information
+            system_info = (
+                f"System Info:\n"
+                f"Python Version: {sys.version}\n"
+                f"Platform: {sys.platform}\n"
+                f"Total Memory: {total_memory} GB\n"
+                f"Used Memory: {used_memory} GB\n"
+                f"Available Memory: {free_memory} GB\n"
+                f"Directory Size: {directory_size_gb} GB"
+            )
+
+            # Display the system information in a message box
+            QMessageBox.information(self, "System Info", system_info)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to get system info: {e}")
 
     def open_config_manager(self):
         """Opens the configuration management dialog."""

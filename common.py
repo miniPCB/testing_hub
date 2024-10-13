@@ -12,6 +12,20 @@ from PyQt5.QtWidgets import QMessageBox
 
 REPO_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def ensure_psutil():
+    """Ensure psutil is installed."""
+    try:
+        import psutil
+    except ImportError:
+        print("psutil is not installed. Installing now...")
+        try:
+            subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'psutil'])
+            import numpy as np
+            print("psutil installed successfully.")
+        except Exception as e:
+            print(f"Failed to install psutil: {e}")
+            sys.exit(1)
+
 def ensure_numpy():
     """Ensure numpy is installed."""
     try:
