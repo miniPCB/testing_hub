@@ -67,11 +67,12 @@ class TestLauncher(QMainWindow):
         self.parent_dir = parent_dir
         self.script_mapping = {}
         self.messages = {}
-        self.load_messages()
+        self.git_pull()
         current_dir = os.path.dirname(os.path.abspath(__file__))
         self.setWindowIcon(QIcon(os.path.join(current_dir, 'icon.png')))
+        self.load_messages()
         self.initUI()
-
+        
     def initUI(self):
         self.setWindowTitle("Testing Hub")
         self.setMinimumSize(1400, 900)
@@ -108,7 +109,7 @@ class TestLauncher(QMainWindow):
         messages_action = QAction("Manage Messages", self)
         messages_action.triggered.connect(self.open_messages_dialog)
         file_menu.addAction(messages_action)
-
+        
         # Manage Configurations action (moved from Configuration menu to File menu)
         manage_config_action = QAction("Manage Configurations", self)
         manage_config_action.triggered.connect(self.open_config_manager)
@@ -213,7 +214,6 @@ class TestLauncher(QMainWindow):
         # Create the tester pane
         tester_layout = QVBoxLayout()
         self.list_widget = QListWidget()
-        tester_layout.addWidget(QPushButton("Update All", clicked=self.git_pull))  # Update button
         tester_layout.addWidget(self.list_widget)
 
         # Populate the QListWidget with scripts
@@ -453,9 +453,11 @@ class TestLauncher(QMainWindow):
             current_dir = os.path.dirname(os.path.abspath(__file__))
             subprocess.check_call(['git', 'fetch'], cwd=current_dir)
             subprocess.check_call(['git', 'pull'], cwd=current_dir)
-            self.append_output("Successfully pulled from the repository.")
+            print("Successfully pulled the repository.")
+            #self.append_output("Successfully pulled from the repository.")
         except subprocess.CalledProcessError as e:
-            self.append_output(f"Error during git pull: {e}")
+            print(f"Error during git pull: {e}")
+            #self.append_output(f"Error during git pull: {e}")
 
     def append_output(self, text):
         self.output_area.append(text)
