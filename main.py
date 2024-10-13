@@ -15,7 +15,9 @@ try:
     from PyQt5.QtWidgets import (
         QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, 
         QPushButton, QMessageBox, QHBoxLayout, QTabWidget, QLineEdit, 
-        QListWidgetItem, QDialog, QInputDialog, QAction, QMainWindow, QCheckBox
+        QListWidgetItem, QDialog, QInputDialog, QAction, QMainWindow, 
+        QCheckBox, QTreeWidget, QTreeWidgetItem,
+        QRadioButton, QButtonGroup, QDialogButtonBox
     )
     from PyQt5.QtCore import QThread, pyqtSignal, Qt
 except ImportError:
@@ -106,6 +108,71 @@ class TestLauncher(QMainWindow):
         exit_action = QAction("Exit", self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
+
+        # Actions menu
+        actions_menu = menu_bar.addMenu("Actions")
+
+        # Apply Process Message action
+        apply_process_message_action = QAction("Apply Process Message", self)
+        apply_process_message_action.triggered.connect(self.apply_process_message)
+        actions_menu.addAction(apply_process_message_action)
+
+        # Apply Red Tag Message action
+        apply_red_tag_message_action = QAction("Apply Red Tag Message", self)
+        apply_red_tag_message_action.triggered.connect(self.apply_red_tag_message)
+        actions_menu.addAction(apply_red_tag_message_action)
+
+    def apply_process_message(self):
+        # Ensure settings are loaded
+        if not hasattr(self, 'settings') or not self.settings:
+            self.load_settings()  # Load settings if they haven't been loaded yet
+
+        # Retrieve process messages from the settings
+        messages = self.settings.get("process_messages", [])
+        
+        if not messages:
+            QMessageBox.warning(self, "No Messages", "No process messages are available to apply.")
+            return
+        
+        # Open the ApplyMessageDialog to select a message (with radio buttons)
+        dialog = ApplyMessageDialog(messages, "Process")
+
+        if dialog.exec_() == QDialog.Accepted:
+            # Correctly pass the selected message to BarcodeProcessingDialog
+            barcode_dialog = BarcodeProcessingDialog(dialog.selected_message, "Process")
+            barcode_dialog.exec_()
+
+    def apply_red_tag_message(self):
+        # Ensure settings are loaded
+        if not hasattr(self, 'settings') or not self.settings:
+            self.load_settings()  # Load settings if they haven't been loaded yet
+
+        # Retrieve red tag messages from the settings
+        messages = self.settings.get("red_tag_messages", [])
+        
+        if not messages:
+            QMessageBox.warning(self, "No Messages", "No red tag messages are available to apply.")
+            return
+        
+        # Open the ApplyMessageDialog to select a red tag message (with radio buttons)
+        dialog = ApplyMessageDialog(messages, "Red Tag")
+
+        if dialog.exec_() == QDialog.Accepted:
+            # Correctly pass the selected message to BarcodeProcessingDialog
+            barcode_dialog = BarcodeProcessingDialog(dialog.selected_message, "Red Tag")
+            barcode_dialog.exec_()
+
+    def load_settings(self):
+        """Loads settings from the JSON file."""
+        settings_file = os.path.join(self.parent_dir, 'config', 'settings.json')
+        try:
+            with open(settings_file, 'r') as file:
+                self.settings = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.settings = {}
+
+    def stop_barcode_processing(self):
+        QMessageBox.information(self, "Process Stopped", "Stopped applying messages to scanned barcodes.")
 
     def open_settings_dialog(self):
         """Opens the settings dialog."""
@@ -426,10 +493,8 @@ class SettingsDialog(QDialog):
             with open(self.settings_file, 'r') as file:
                 return json.load(file)
         except FileNotFoundError:
-            QMessageBox.warning(self, "Error", f"Settings file not found: {self.settings_file}")
             return {}
         except json.JSONDecodeError:
-            QMessageBox.warning(self, "Error", f"Error reading settings file: {self.settings_file}")
             return {}
 
     def save_settings(self):
@@ -437,7 +502,6 @@ class SettingsDialog(QDialog):
         try:
             with open(self.settings_file, 'w') as file:
                 json.dump(self.settings, file, indent=4)
-            QMessageBox.information(self, "Success", "Settings saved successfully.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save settings: {str(e)}")
 
@@ -468,14 +532,14 @@ class SettingsDialog(QDialog):
         add_button.clicked.connect(self.add_process_message)
         layout.addWidget(add_button)
 
-        # List of process messages with checkboxes
-        self.process_message_list = QListWidget()
+        # Create a QTreeWidget to display process messages
+        self.process_message_tree = QTreeWidget()
+        self.process_message_tree.setHeaderLabels(["", "Process Message"])
         for message in self.settings.get("process_messages", []):
-            item = QListWidgetItem(message)
-            checkbox = QCheckBox()
-            self.process_message_list.addItem(item)
-            self.process_message_list.setItemWidget(item, checkbox)
-        layout.addWidget(self.process_message_list)
+            item = QTreeWidgetItem(self.process_message_tree)
+            item.setText(1, message)
+            item.setCheckState(0, Qt.Unchecked)
+        layout.addWidget(self.process_message_tree)
 
         # Button to remove selected process messages
         remove_button = QPushButton("Remove Selected")
@@ -498,14 +562,14 @@ class SettingsDialog(QDialog):
         add_button.clicked.connect(self.add_red_tag_message)
         layout.addWidget(add_button)
 
-        # List of red tag messages with checkboxes
-        self.red_tag_message_list = QListWidget()
+        # Create a QTreeWidget to display red tag messages
+        self.red_tag_message_tree = QTreeWidget()
+        self.red_tag_message_tree.setHeaderLabels(["", "Red Tag Message"])
         for message in self.settings.get("red_tag_messages", []):
-            item = QListWidgetItem(message)
-            checkbox = QCheckBox()
-            self.red_tag_message_list.addItem(item)
-            self.red_tag_message_list.setItemWidget(item, checkbox)
-        layout.addWidget(self.red_tag_message_list)
+            item = QTreeWidgetItem(self.red_tag_message_tree)
+            item.setText(1, message)
+            item.setCheckState(0, Qt.Unchecked)
+        layout.addWidget(self.red_tag_message_tree)
 
         # Button to remove selected red tag messages
         remove_button = QPushButton("Remove Selected")
@@ -518,42 +582,103 @@ class SettingsDialog(QDialog):
         """Adds a new process message."""
         message = self.process_message_input.text().strip()
         if message:
+            item = QTreeWidgetItem(self.process_message_tree)
+            item.setText(1, message)
+            item.setCheckState(0, Qt.Unchecked)
             self.settings.setdefault("process_messages", []).append(message)
-            item = QListWidgetItem(message)
-            checkbox = QCheckBox()
-            self.process_message_list.addItem(item)
-            self.process_message_list.setItemWidget(item, checkbox)
             self.process_message_input.clear()
 
     def remove_process_message(self):
         """Removes the selected process messages."""
-        for index in reversed(range(self.process_message_list.count())):
-            item = self.process_message_list.item(index)
-            checkbox = self.process_message_list.itemWidget(item)
-            if checkbox.isChecked():
-                self.process_message_list.takeItem(index)
-                self.settings["process_messages"].remove(item.text())
+        # Reverse loop to avoid skipping items when removing
+        for index in range(self.process_message_tree.topLevelItemCount() - 1, -1, -1):
+            item = self.process_message_tree.topLevelItem(index)
+            if item.checkState(0) == Qt.Checked:
+                # Remove from the tree widget
+                self.process_message_tree.takeTopLevelItem(index)
+                # Remove from the settings
+                self.settings["process_messages"].remove(item.text(1))
 
     def add_red_tag_message(self):
         """Adds a new red tag message."""
         message = self.red_tag_message_input.text().strip()
         if message:
+            item = QTreeWidgetItem(self.red_tag_message_tree)
+            item.setText(1, message)
+            item.setCheckState(0, Qt.Unchecked)
             self.settings.setdefault("red_tag_messages", []).append(message)
-            item = QListWidgetItem(message)
-            checkbox = QCheckBox()
-            self.red_tag_message_list.addItem(item)
-            self.red_tag_message_list.setItemWidget(item, checkbox)
             self.red_tag_message_input.clear()
 
     def remove_red_tag_message(self):
         """Removes the selected red tag messages."""
-        for index in reversed(range(self.red_tag_message_list.count())):
-            item = self.red_tag_message_list.item(index)
-            checkbox = self.red_tag_message_list.itemWidget(item)
-            if checkbox.isChecked():
-                self.red_tag_message_list.takeItem(index)
-                self.settings["red_tag_messages"].remove(item.text())
+        # Reverse loop to avoid skipping items when removing
+        for index in range(self.red_tag_message_tree.topLevelItemCount() - 1, -1, -1):
+            item = self.red_tag_message_tree.topLevelItem(index)
+            if item.checkState(0) == Qt.Checked:
+                # Remove from the tree widget
+                self.red_tag_message_tree.takeTopLevelItem(index)
+                # Remove from the settings
+                self.settings["red_tag_messages"].remove(item.text(1))
 
+class ApplyMessageDialog(QDialog):
+    def __init__(self, messages, message_type):
+        super().__init__()
+        self.setWindowTitle(f"Apply {message_type} Message")
+        self.selected_message = None
+        self.message_type = message_type
+
+        # Layout for radio buttons
+        layout = QVBoxLayout()
+
+        # Add a title for the dialog
+        label = QLabel(f"Select {message_type} Message to Apply:")
+        layout.addWidget(label)
+
+        # Create a group of radio buttons for the messages
+        self.button_group = QButtonGroup(self)
+        for i, message in enumerate(messages):
+            radio_button = QRadioButton(message)
+            self.button_group.addButton(radio_button, i)
+            layout.addWidget(radio_button)
+
+        # Create an Apply button
+        apply_button = QPushButton("Apply Message")
+        apply_button.clicked.connect(self.apply_message)
+        layout.addWidget(apply_button)
+
+        self.setLayout(layout)
+
+    def apply_message(self):
+        # Get the selected message
+        selected_button = self.button_group.checkedButton()
+        if selected_button:
+            self.selected_message = selected_button.text()
+            self.accept()
+        else:
+            QMessageBox.warning(self, "No Selection", f"No {self.message_type} message selected.")
+
+class BarcodeProcessingDialog(QDialog):
+    stop_signal = pyqtSignal()
+
+    def __init__(self, message, message_type):
+        super().__init__()
+        self.setWindowTitle(f"Applying {message_type} Message")
+        
+        layout = QVBoxLayout()
+        
+        # Display the selected message
+        layout.addWidget(QLabel(f"Applying '{message}' to scanned barcodes..."))
+
+        # Stop button
+        stop_button = QPushButton("Stop")
+        stop_button.clicked.connect(self.stop_processing)
+        layout.addWidget(stop_button)
+
+        self.setLayout(layout)
+
+    def stop_processing(self):
+        self.stop_signal.emit()  # Emit the stop signal
+        self.accept()  # Close the dialog
 
 if __name__ == "__main__":
     parent_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))

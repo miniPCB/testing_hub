@@ -1,12 +1,13 @@
 {
-    "username": "NManteufel",
-    "theme": "light",
-    "autosave": "true",
     "process_messages": [
-        "Applied Barcode 1"
+        "New message",
+        "New second message"
     ],
     "red_tag_messages": [
-        "3V3 SHORT, NOT BGA",
-        "3V3 SHORT, BGA"
-    ]
+        "3V3 SHORT, BGA",
+        "3V3 SHORT, NOT BGA"
+    ],
+    "username": "NManteufel",
+    "theme": "light",
+    "autosave": "true"
 }
