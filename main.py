@@ -3,7 +3,7 @@ import sys
 import subprocess
 from datetime import datetime
 import json
-from common import ensure_psutil, ensure_numpy, ensure_pyqt_installed, parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, load_red_tag_messages, add_red_tag_message, save_red_tag_messages
+from common import ensure_psutil, ensure_numpy, ensure_pyqt_installed, get_directory_size, parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, load_red_tag_messages, add_red_tag_message, save_red_tag_messages
 
 try:
     import psutil
@@ -165,15 +165,6 @@ class TestLauncher(QMainWindow):
     # New method to show author information
     def show_author_info(self):
         QMessageBox.information(self, "Author", "Author: Nolan Manteufel\nContact: nolan@minipcb.com")
-
-    def get_directory_size(start_path='.'):
-        """Recursively calculate the size of the directory."""
-        total_size = 0
-        for dirpath, dirnames, filenames in os.walk(start_path):
-            for f in filenames:
-                fp = os.path.join(dirpath, f)
-                total_size += os.path.getsize(fp)
-        return total_size
 
     def show_system_info(self):
         try:

@@ -73,6 +73,15 @@ def check_gitpython():
         install_gitpython()
         return check_gitpython()  # Retry import after installation
 
+def get_directory_size(start_path='.'):
+    """Recursively calculate the size of the directory."""
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
+
 def push_to_github(directory, commit_message):
     """Push changes to the specified GitHub repository."""
     try:
