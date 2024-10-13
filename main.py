@@ -247,7 +247,6 @@ class TestLauncher(QMainWindow):
         try:
             with open(messages_file, 'r') as file:
                 self.messages = json.load(file)
-                print("messages loaded successfully:", self.messages)
         except (FileNotFoundError, json.JSONDecodeError):
             self.messages = {}
             print(f"Failed to load messages or {messages_file} not found.")
