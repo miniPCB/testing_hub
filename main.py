@@ -78,7 +78,7 @@ class TestLauncher(QMainWindow):
         self.setWindowIcon(QIcon(os.path.join(current_dir, 'icon.png')))
 
         # Check if Waveforms is installed
-        if not self.is_waveforms_installed():
+        if not self.check_waveforms_installation():
             QMessageBox.critical(self, "Missing Dependency", 
                                  "Waveforms is not installed. Please install Waveforms to continue.")
             sys.exit(1)  # Exit the application if Waveforms is not installed
@@ -86,17 +86,29 @@ class TestLauncher(QMainWindow):
         self.load_messages()
         self.initUI()
 
-    def is_waveforms_installed(self):
-        """Checks if Waveforms is installed on the system."""
-        try:
-            # Try to run Waveforms on Linux or Windows to check if it's installed
-            if sys.platform.startswith('linux'):
-                subprocess.run(["which", "waveforms"], check=True)
-            elif sys.platform.startswith('win'):
-                subprocess.run(["where", "waveforms"], check=True)
-            return True
-        except subprocess.CalledProcessError:
-            return False
+    def check_waveforms_installation(self):
+        """
+        Check if WaveForms is installed on the system.
+        Returns True if installed, False otherwise.
+        """
+        # Check for Windows installation
+        if sys.platform.startswith("win"):
+            waveforms_path = r"C:\Program Files (x86)\Digilent\WaveForms3"
+            if os.path.exists(waveforms_path):
+                return True
+            else:
+                return False
+        
+        # Check for Linux installation
+        elif sys.platform.startswith("linux"):
+            waveforms_path = "/usr/bin/waveforms"  # Modify if your path differs
+            if os.path.exists(waveforms_path):
+                return True
+            else:
+                return False
+        
+        # If neither Windows nor Linux, assume it's not installed
+        return False
 
     def initUI(self):
         self.setWindowTitle("Testing Hub")
