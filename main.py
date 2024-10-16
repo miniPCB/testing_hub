@@ -3,12 +3,6 @@ import sys
 import subprocess
 from datetime import datetime
 import json
-from PyQt5.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, 
-    QPushButton, QMessageBox, QHBoxLayout, QTabWidget, QLineEdit, 
-    QListWidgetItem, QDialog, QInputDialog
-)
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from common import parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, load_red_tag_messages, add_red_tag_message, save_red_tag_messages
 
 def ensure_pyqt_installed():
@@ -22,8 +16,13 @@ def ensure_pyqt_installed():
 
 try:
     from PyQt5.QtWidgets import (
-        QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget
+    QMainWindow, QMenuBar, QMenu, QAction, QWidget, QVBoxLayout, QTabWidget, QListWidget, QTextEdit, QPushButton, 
+    QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, 
+    QPushButton, QMessageBox, QHBoxLayout, QTabWidget, QLineEdit, 
+    QListWidgetItem, QDialog, QInputDialog, 
+    QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, QMenuBar, QMenu, QAction
     )
+    from PyQt5.QtCore import QThread, pyqtSignal, Qt
 except ImportError:
     print("PyQt5 is not installed. Installing now...")
     ensure_pyqt_installed()
@@ -64,7 +63,7 @@ class TestRunner(QThread):
 
         self.process.wait()
 
-class TestLauncher(QWidget):
+class TestLauncher(QMainWindow):
     def __init__(self, parent_dir):
         super().__init__()
         self.parent_dir = parent_dir
@@ -75,7 +74,10 @@ class TestLauncher(QWidget):
     def initUI(self):
         self.setWindowTitle("Testing Hub")
         self.setMinimumSize(1400, 900)
-        
+
+        # Create the menu bar
+        self.create_menu_bar()
+
         # Create the tab widget
         self.tab_widget = QTabWidget()
 
@@ -89,11 +91,52 @@ class TestLauncher(QWidget):
         self.setup_reports_tab()
         self.tab_widget.addTab(self.reports_tab, "Reports")
 
-        # Set the main layout
-        layout = QVBoxLayout()
+        # Set the main layout inside a central widget
+        central_widget = QWidget(self)
+        layout = QVBoxLayout(central_widget)
         layout.addWidget(self.tab_widget)
-        self.setLayout(layout)
+        self.setCentralWidget(central_widget)  # Use setCentralWidget for QMainWindow
         self.show()
+
+    def create_menu_bar(self):
+        """Creates the menu bar with File and View menus."""
+        menu_bar = self.menuBar()  # Use menuBar() from QMainWindow
+
+        # Create File menu
+        file_menu = QMenu("File", self)
+
+        # Add "Update System" option
+        update_action = QAction("Update System", self)
+        update_action.triggered.connect(self.git_pull)  # Connect to the git pull function
+        file_menu.addAction(update_action)
+
+        # Add "Exit" option
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.close_application)  # Connect to close function
+        file_menu.addAction(exit_action)
+
+        # Add File menu to the menu bar
+        menu_bar.addMenu(file_menu)
+
+        # Create View menu
+        view_menu = QMenu("View", self)
+
+        # Add "Testing" option
+        view_testing_action = QAction("Testing", self)
+        view_testing_action.triggered.connect(lambda: self.tab_widget.setCurrentWidget(self.testing_tab))  # Switch to Testing tab
+        view_menu.addAction(view_testing_action)
+
+        # Add "Reports" option
+        view_reports_action = QAction("Reports", self)
+        view_reports_action.triggered.connect(lambda: self.tab_widget.setCurrentWidget(self.reports_tab))  # Switch to Reports tab
+        view_menu.addAction(view_reports_action)
+
+        # Add View menu to the menu bar
+        menu_bar.addMenu(view_menu)
+
+    def close_application(self):
+        """Closes the application."""
+        self.close()
 
     def setup_testing_tab(self):
         """Sets up the Testing tab UI."""
@@ -364,14 +407,22 @@ class TestLauncher(QWidget):
             QMessageBox.warning(self, "Error", f"Failed to open report: {str(e)}")
 
     def git_pull(self):
-        """Function to run git fetch and then git pull command."""
+        """Function to run git fetch and then git pull command in the current script's directory."""
+        # Get the directory where the script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Check if the directory contains a .git folder
+        if not os.path.isdir(os.path.join(script_dir, '.git')):
+            self.append_output("Error: The directory is not a valid Git repository.")
+            return
+
         try:
-            subprocess.check_call(['git', 'fetch'], cwd=self.parent_dir)
-            subprocess.check_call(['git', 'pull'], cwd=self.parent_dir)
+            # Run git fetch and pull commands
+            subprocess.check_call(['git', 'fetch'], cwd=script_dir)
+            subprocess.check_call(['git', 'pull'], cwd=script_dir)
             self.append_output("Successfully pulled from the repository.")
         except subprocess.CalledProcessError as e:
             self.append_output(f"Error during git pull: {e}")
-
 
     def run_test(self, script, directory):
         if self.runner and self.runner.isRunning():
