@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_104010",
+            "barcode": "pt_tlxx-0002-3-00232",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_104047",
+            "red_tag_message": "Production: No zoom, Focus, or PIRIS"
+        }
+    ]
+}

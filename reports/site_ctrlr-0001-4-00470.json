@@ -1,0 +1,20 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_104248",
+            "barcode": "site_ctrlr-0001-4-00470",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_104513",
+            "red_tag_message": "Does not detect MFM+ signals.  C1.P2 broke off."
+        },
+        {
+            "timestamp": "20241015_145724",
+            "red_tag_message": "RMA_1778"
+        }
+    ]
+}

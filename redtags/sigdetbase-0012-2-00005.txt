@@ -1,7 +1,0 @@
-Board Name: sigdetbase
-Board Revision: 0012
-Board Variant: 2
-Board Serial Number: 00005
-Message: 2024-09-09 19:52:21 - pi@raspberrypi - Applied Barcode
-Message: 2024-09-09 19:52:28 - pi@raspberrypi - PASSED Bring-up Testing
-Message: 2024-09-09 19:52:34 - pi@raspberrypi - PASSED Final Assembly Testing

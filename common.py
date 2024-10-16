@@ -3,28 +3,15 @@ import json
 import sys
 import subprocess
 import os
-import git
 import time
 from datetime import datetime
 from ctypes import *
+import git
+import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
 REPO_DIR = os.path.dirname(os.path.abspath(__file__))
-
-def ensure_psutil():
-    """Ensure psutil is installed."""
-    try:
-        import psutil
-    except ImportError:
-        print("psutil is not installed. Installing now...")
-        try:
-            subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'psutil'])
-            import numpy as np
-            print("psutil installed successfully.")
-        except Exception as e:
-            print(f"Failed to install psutil: {e}")
-            sys.exit(1)
 
 def ensure_numpy():
     """Ensure numpy is installed."""
@@ -39,15 +26,6 @@ def ensure_numpy():
         except Exception as e:
             print(f"Failed to install numpy: {e}")
             sys.exit(1)
-
-def ensure_pyqt_installed():
-    """Ensure PyQt5 is installed."""
-    try:
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'PyQt5'])
-        print("PyQt5 has been installed successfully.")
-    except Exception as e:
-        print(f"Failed to install PyQt5: {e}")
-        sys.exit(1)
 
 def install_gitpython():
     """Install GitPython dynamically based on the system type."""
@@ -72,15 +50,6 @@ def check_gitpython():
     except ModuleNotFoundError:
         install_gitpython()
         return check_gitpython()  # Retry import after installation
-
-def get_directory_size(start_path='.'):
-    """Recursively calculate the size of the directory."""
-    total_size = 0
-    for dirpath, dirnames, filenames in os.walk(start_path):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
-            total_size += os.path.getsize(fp)
-    return total_size
 
 def push_to_github(directory, commit_message):
     """Push changes to the specified GitHub repository."""
@@ -239,7 +208,7 @@ def process_flow_json_to_html(process_flow_data):
     """
 
     for message in process_flow_messages:
-        timestamp = message.get("datetime", "N/A")
+        timestamp = message.get("timestamp", "N/A")
         process_flow_message = message.get("process_flow_message", "No message available")
 
         html += f"""

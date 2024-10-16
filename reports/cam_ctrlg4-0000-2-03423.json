@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_101212",
+            "barcode": "cam_ctrlg4-0000-2-03423",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_101315",
+            "red_tag_message": "Production: Cause of GST freeze"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_104600",
+            "barcode": "pt_tlxx-0002-3-02249",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_104642",
+            "red_tag_message": "Production: Pan or Tilt does not work while testing"
+        }
+    ]
+}

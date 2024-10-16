@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_153218",
+            "barcode": "pt_tlxx-0002-3-02101",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_153345",
+            "red_tag_message": "Production: Only works when connected as cam 2"
+        }
+    ]
+}

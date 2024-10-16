@@ -1,0 +1,58 @@
+Menu Bar
+File
+    System Update
+    Exit
+
+Edit
+    Process Messages
+    Red Tag Messages
+    Build Configurations
+
+View
+    Testing (check for waveforms on open)
+    Reports
+    Builds
+
+Apply
+    Process Messages
+    Red Tag Messages
+    Build Configurations
+
+About
+    Author
+    System
+-----------------
+On Launch
+- check for dependancies and automatically install missing imports
+-----------------
+dependancies.py
+    ensure_numpy
+    install_gitpython
+    check_gitpython
+
+common_test_program.py
+    push_to_github
+    calculate_average
+    truncate
+    scan_barcode
+    LoadPCBDialog
+    determine_pass_fail
+    parse_pcb_barcode
+
+common_html.py
+    report_json_to_html
+    red_tag_messages_json_to_html
+    process_flow_json_to_html
+
+messages_red_tag.py
+    add_red_tag_message
+    load_red_tag_messages
+    save_red_tag_messages
+    update_red_tag_message
+
+messages_process_flow.py
+    add_process_flow_message
+    load_process_flow_messages
+    save_process_flow_messages
+    update_process_flow_message
+

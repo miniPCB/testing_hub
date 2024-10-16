@@ -1,0 +1,20 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_103047",
+            "barcode": "sigdetbase-0013-4-00034",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_104116",
+            "red_tag_message": "While MFM+ VLPD Configuration is set to 3 or 2 in cyclops gui deb-20240415 and tester connected to J9 S1_YEL, S1_RED do NOT respond (Turn on).  U1SO1 is damaged."
+        },
+        {
+            "timestamp": "20241015_145555",
+            "red_tag_message": "RMA_01779"
+        }
+    ]
+}

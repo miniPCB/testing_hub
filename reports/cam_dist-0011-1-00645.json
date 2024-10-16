@@ -1,0 +1,20 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_145758",
+            "barcode": "cam_dist-0011-1-00645",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_145851",
+            "red_tag_message": "Production: Reboots system, cameras do not start up"
+        },
+        {
+            "timestamp": "20241015_150022",
+            "red_tag_message": "Production: does not pan"
+        }
+    ]
+}

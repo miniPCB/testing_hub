@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_150146",
+            "barcode": "mdx_8428-0000-1-01241",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_150219",
+            "red_tag_message": "Production: CAM would not boot"
+        }
+    ]
+}

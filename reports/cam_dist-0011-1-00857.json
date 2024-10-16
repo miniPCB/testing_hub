@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_104420",
+            "barcode": "cam_dist-0011-1-00857",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_104529",
+            "red_tag_message": "Production: \"could not initialize heaters\" error message in gui log"
+        }
+    ]
+}

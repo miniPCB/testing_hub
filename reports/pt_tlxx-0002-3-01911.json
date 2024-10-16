@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_101901",
+            "barcode": "pt_tlxx-0002-3-01911",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_102048",
+            "red_tag_message": "Production: Lens PIRIS does not function"
+        }
+    ]
+}
