@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241016_103940",
-            "red_tag_message": "Production: No PIRIS"
+            "red_tag_message": "No PIRIS",
+            "source": "Production"
         }
     ]
 }

@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241016_101315",
-            "red_tag_message": "Production: Cause of GST freeze"
+            "red_tag_message": "Cause of GST freeze",
+            "source": "Production"
         }
     ]
 }

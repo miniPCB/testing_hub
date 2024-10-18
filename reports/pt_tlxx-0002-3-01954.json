@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_150820",
-            "red_tag_message": "Production: CAM does not pan"
+            "red_tag_message": "CAM does not pan",
+            "source": "Production"
         }
     ]
 }

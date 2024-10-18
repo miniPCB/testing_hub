@@ -10,15 +10,18 @@
     "red_tag_messages": [
         {
             "timestamp": "20241016_101514",
-            "red_tag_message": "Production: unable to see FPGA"
+            "red_tag_message": "unable to see FPGA",
+            "source": "Production"
         },
         {
             "timestamp": "20241016_101548",
-            "red_tag_message": "Production: \"could not initiate heaters\" error message in gui log"
+            "red_tag_message": "\"could not initiate heaters\" error message in gui log",
+            "source": "Production"
         },
         {
             "timestamp": "20241016_101617",
-            "red_tag_message": "Production: \"could not set a fan PWM\" error message in gui log"
+            "red_tag_message": "\"could not set a fan PWM\" error message in gui log",
+            "source": "Production"
         }
     ]
 }

@@ -10,11 +10,13 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_145851",
-            "red_tag_message": "Production: Reboots system, cameras do not start up"
+            "red_tag_message": "Reboots system, cameras do not start up",
+            "source": "Production"
         },
         {
             "timestamp": "20241015_150022",
-            "red_tag_message": "Production: does not pan"
+            "red_tag_message": "does not pan",
+            "source": "Production"
         }
     ]
 }

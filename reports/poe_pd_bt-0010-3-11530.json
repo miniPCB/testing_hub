@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_152904",
-            "red_tag_message": "Production: No LED"
+            "red_tag_message": "No LED",
+            "source": "Production"
         }
     ]
 }

@@ -1,0 +1,22 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241018_105639",
+            "barcode": "sigdetbase-0013-4-00062",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241018_105739",
+            "red_tag_message": "While operating on mode 2 standard config in gui, S2_RED does not turn on",
+            "source": "Production"
+        },
+        {
+            "timestamp": "20241018_105834",
+            "red_tag_message": "While operating mode 3, two bulb, in gui, S2_YEL does not turn on",
+            "source": "Production"
+        }
+    ]
+}

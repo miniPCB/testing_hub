@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241016_104529",
-            "red_tag_message": "Production: \"could not initialize heaters\" error message in gui log"
+            "red_tag_message": "\"could not initialize heaters\" error message in gui log",
+            "source": "Production"
         }
     ]
 }

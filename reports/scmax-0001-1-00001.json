@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241017_132153",
+            "barcode": "scmax-0001-1-00001",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241017_132216",
+            "red_tag_message": "Engineering sample used in testing. Not to be used in production.",
+            "source": "Engineer"
+        }
+    ]
+}

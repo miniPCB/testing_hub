@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_152438",
-            "red_tag_message": "Production: Cameras will not boot up"
+            "red_tag_message": "Cameras will not boot up",
+            "source": "Production"
         }
     ]
 }

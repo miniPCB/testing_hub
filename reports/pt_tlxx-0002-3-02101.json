@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_153345",
-            "red_tag_message": "Production: Only works when connected as cam 2"
+            "red_tag_message": "Only works when connected as cam 2",
+            "source": "Production"
         }
     ]
 }

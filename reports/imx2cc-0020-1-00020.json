@@ -199,11 +199,13 @@
     "red_tag_messages": [
         {
             "timestamp": "20241011_111803",
-            "red_tag_message": "Short circuit under the BGA U1 IC."
+            "red_tag_message": "Short circuit under the BGA U1 IC.",
+            "source": "Engineer"
         },
         {
             "timestamp": "20241011_111828",
-            "red_tag_message": "Ms Than says the repair is more difficult than it's worth."
+            "red_tag_message": "Ms Than says the repair is more difficult than it's worth.",
+            "source": "Engineer"
         }
     ]
 }

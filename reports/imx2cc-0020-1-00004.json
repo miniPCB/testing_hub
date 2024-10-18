@@ -99,18 +99,5 @@
         }
     ],
     "process_flow_messages": [],
-    "red_tag_messages": [
-        {
-            "timestamp": "20241011_124030",
-            "red_tag_message": "This is a test of the push to github function."
-        },
-        {
-            "timestamp": "20241011_131303",
-            "red_tag_message": "does this still work?"
-        },
-        {
-            "timestamp": "20241011_134654",
-            "red_tag_message": "This should still work."
-        }
-    ]
+    "red_tag_messages": []
 }

@@ -10,15 +10,18 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_151041",
-            "red_tag_message": "Production: All CAM orientation is not correct"
+            "red_tag_message": "All CAM orientation is not correct",
+            "source": "Production"
         },
         {
             "timestamp": "20241015_151124",
-            "red_tag_message": "Production: \"Could not set heater pwm\" error message in gui log"
+            "red_tag_message": "\"Could not set heater pwm\" error message in gui log",
+            "source": "Production"
         },
         {
             "timestamp": "20241015_151204",
-            "red_tag_message": "Production: \"Could not set fan pwm\" error message in gui log"
+            "red_tag_message": "\"Could not set fan pwm\" error message in gui log",
+            "source": "Production"
         }
     ]
 }

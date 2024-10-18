@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_150433",
-            "red_tag_message": "Production: Pan grinds, does not move"
+            "red_tag_message": "Pan grinds, does not move",
+            "source": "Production"
         }
     ]
 }

@@ -1,16 +1,16 @@
 {
     "test_reports": [
         {
-            "timestamp": "20241015_150457",
-            "barcode": "pt_tlxx-0002-3-01918",
+            "timestamp": "20241018_105228",
+            "barcode": "sigdetbase-0013-4-00086",
             "overall_status": "Fail"
         }
     ],
     "process_flow_messages": [],
     "red_tag_messages": [
         {
-            "timestamp": "20241015_150524",
-            "red_tag_message": "Does not focus",
+            "timestamp": "20241018_105309",
+            "red_tag_message": "No green on light phase channel 1",
             "source": "Production"
         }
     ]

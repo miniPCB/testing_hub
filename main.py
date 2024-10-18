@@ -3,7 +3,7 @@ import sys
 import subprocess
 from datetime import datetime
 import json
-from common import parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, load_red_tag_messages, add_red_tag_message, save_red_tag_messages
+from common import parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, load_red_tag_messages, add_red_tag_message, save_red_tag_messages, check_for_updates, messages_to_html
 
 def ensure_pyqt_installed():
     """Ensure PyQt5 is installed."""
@@ -16,11 +16,10 @@ def ensure_pyqt_installed():
 
 try:
     from PyQt5.QtWidgets import (
-    QMainWindow, QMenuBar, QMenu, QAction, QWidget, QVBoxLayout, QTabWidget, QListWidget, QTextEdit, QPushButton, 
-    QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, 
-    QPushButton, QMessageBox, QHBoxLayout, QTabWidget, QLineEdit, 
-    QListWidgetItem, QDialog, QInputDialog, 
-    QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, QMenuBar, QMenu, QAction
+        QAction, QApplication, QCheckBox, QComboBox, QDialog, QFormLayout, QGroupBox, 
+        QHBoxLayout, QInputDialog, QLabel, QLineEdit, QListWidget, QListWidgetItem, 
+        QMainWindow, QMenu, QMenuBar, QMessageBox, QPushButton, QRadioButton, 
+        QTabWidget, QTextEdit, QVBoxLayout, QWidget
     )
     from PyQt5.QtCore import QThread, pyqtSignal, Qt
 except ImportError:
@@ -91,6 +90,11 @@ class TestLauncher(QMainWindow):
         self.setup_reports_tab()
         self.tab_widget.addTab(self.reports_tab, "Reports")
 
+        # Create Message Reader tab
+        self.message_reader_tab = QWidget()
+        self.setup_message_reader_tab()
+        self.tab_widget.addTab(self.message_reader_tab, "Message Reader")
+
         # Set the main layout inside a central widget
         central_widget = QWidget(self)
         layout = QVBoxLayout(central_widget)
@@ -99,41 +103,38 @@ class TestLauncher(QMainWindow):
         self.show()
 
     def create_menu_bar(self):
-        """Creates the menu bar with File and View menus."""
-        menu_bar = self.menuBar()  # Use menuBar() from QMainWindow
+        """Creates the menu bar with File, View, and Apply menus."""
+        menu_bar = self.menuBar()
 
-        # Create File menu
+        # File menu
         file_menu = QMenu("File", self)
-
-        # Add "Update System" option
-        update_action = QAction("Update System", self)
-        update_action.triggered.connect(self.git_pull)  # Connect to the git pull function
-        file_menu.addAction(update_action)
-
-        # Add "Exit" option
-        exit_action = QAction("Exit", self)
-        exit_action.triggered.connect(self.close_application)  # Connect to close function
-        file_menu.addAction(exit_action)
-
-        # Add File menu to the menu bar
+        file_menu.addAction(QAction("Update System", self, triggered=self.git_pull))
+        file_menu.addAction(QAction("Exit", self, triggered=self.close_application))
         menu_bar.addMenu(file_menu)
 
-        # Create View menu
+        # View menu
         view_menu = QMenu("View", self)
-
-        # Add "Testing" option
-        view_testing_action = QAction("Testing", self)
-        view_testing_action.triggered.connect(lambda: self.tab_widget.setCurrentWidget(self.testing_tab))  # Switch to Testing tab
-        view_menu.addAction(view_testing_action)
-
-        # Add "Reports" option
-        view_reports_action = QAction("Reports", self)
-        view_reports_action.triggered.connect(lambda: self.tab_widget.setCurrentWidget(self.reports_tab))  # Switch to Reports tab
-        view_menu.addAction(view_reports_action)
-
-        # Add View menu to the menu bar
+        view_menu.addAction(QAction("Testing", self, triggered=lambda: self.tab_widget.setCurrentWidget(self.testing_tab)))
+        view_menu.addAction(QAction("Reports", self, triggered=lambda: self.tab_widget.setCurrentWidget(self.reports_tab)))
+        view_menu.addAction(QAction("Message Reader", self, triggered=lambda: self.tab_widget.setCurrentWidget(self.message_reader_tab)))  # Message Reader action
         menu_bar.addMenu(view_menu)
 
+        # Apply menu
+        apply_menu = QMenu("Apply", self)
+        apply_menu.addAction(QAction("Apply Red Tag", self, triggered=self.apply_red_tag))
+        apply_menu.addAction(QAction("Apply Process Message", self, triggered=self.apply_process_message))
+        menu_bar.addMenu(apply_menu)
+
+    def apply_red_tag(self):
+        """Handle Apply Red Tag action and open the dialog to display messages with radio buttons."""
+        apply_dialog = ApplyRedTagDialog(self)
+        apply_dialog.exec_()
+        
+    def apply_process_message(self):
+        """Handle Apply Process Message action and open the dialog to display messages with radio buttons."""
+        apply_dialog = ApplyProcessFlowDialog(self)
+        apply_dialog.exec_()
+        
     def close_application(self):
         """Closes the application."""
         self.close()
@@ -273,6 +274,13 @@ class TestLauncher(QMainWindow):
         # Create a horizontal layout for the input field and button
         input_layout = QHBoxLayout()
 
+        # Create a label and combo box for the source selection
+        source_label = QLabel("Source:")
+        self.source_combo_box = QComboBox()
+        self.source_combo_box.addItems(["Production", "Assembly", "Engineer"])
+        input_layout.addWidget(source_label)
+        input_layout.addWidget(self.source_combo_box)
+
         # Create input field for the new red tag message
         self.red_tag_input = QLineEdit()
         self.red_tag_input.setPlaceholderText("Enter Red Tag Message...")
@@ -292,17 +300,24 @@ class TestLauncher(QMainWindow):
     def on_add_red_tag_message(self):
         """Handles the addition of a red tag message."""
         message = self.red_tag_input.text().strip()
+        source = self.source_combo_box.currentText()  # Get the selected source
+
         if message:
             if hasattr(self, 'last_opened_file'):
-                add_red_tag_message(message, self.last_opened_file)  # Call the function with the last opened file
+                # Create a structured message with the source and message
+                structured_message = {
+                    "timestamp": datetime.now().strftime("%Y%m%d_%H%M%S"),
+                    "source": source,
+                    "red_tag_message": message
+                }
+                add_red_tag_message(structured_message, self.last_opened_file)  # Call the function with the last opened file
                 self.red_tag_input.clear()  # Clear the input field after adding
-                # Optionally, reload/display the updated messages
-                load_red_tag_messages(self)  # Ensure this function is implemented to refresh the display
+                load_red_tag_messages(self)  # Refresh the display
             else:
                 QMessageBox.warning(self, "Error", "No report file is currently open.")
         else:
             QMessageBox.warning(self, "Input Error", "Please enter a message.")
-
+            
     def filter_reports(self):
         """Filter the report list based on the barcode input."""
         barcode = self.barcode_input.text().strip().lower()
@@ -406,6 +421,83 @@ class TestLauncher(QMainWindow):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to open report: {str(e)}")
 
+    def setup_message_reader_tab(self):
+        """Sets up the Message Reader tab UI."""
+        layout = QHBoxLayout()
+
+        # Create a vertical layout for the side panel
+        side_panel_layout = QVBoxLayout()
+        
+        self.board_list_widget = QListWidget()
+        self.board_list_widget.setFixedWidth(250)  # Set fixed width to 250 pixels
+        
+        # Connect double-click event to load messages for the selected board
+        self.board_list_widget.itemDoubleClicked.connect(self.load_messages_for_board)
+        
+        side_panel_layout.addWidget(QLabel("Board Names:"))
+        side_panel_layout.addWidget(self.board_list_widget)
+
+        # Create the message display area
+        self.message_display = QTextEdit()
+        self.message_display.setReadOnly(True)
+        self.message_display.setMinimumHeight(620)
+
+        layout.addLayout(side_panel_layout)
+        layout.addWidget(self.message_display)
+        self.message_reader_tab.setLayout(layout)
+
+        # Load board names into the list
+        self.load_board_names()
+
+    def load_board_names(self):
+        """Load board names into the side panel list widget."""
+        self.board_list_widget.clear()  # Clear existing items
+
+        reports_dir = os.path.join(self.parent_dir, 'testing_hub', 'reports')  # Path to reports directory
+
+        # Use a set to store unique board names
+        board_names_set = set()
+
+        # Scan the reports directory
+        try:
+            for filename in os.listdir(reports_dir):
+                if filename.endswith('.json'):  # Assuming report files are JSON
+                    # Extract the board name from the filename
+                    board_name = filename.split('-')[0]  # Adjust based on your naming convention
+                    board_names_set.add(board_name)  # Add to the set for uniqueness
+
+            # Convert set to sorted list and add to the list widget
+            unique_board_names = sorted(board_names_set)
+            self.board_list_widget.addItems(unique_board_names)
+
+        except Exception as e:
+            print(f"Error loading board names: {e}")
+
+    def load_messages_for_board(self, item):
+        """Load messages for the selected board and display them in HTML format."""
+        board_name = item.text()
+        reports_dir = os.path.join(self.parent_dir, 'testing_hub', 'reports')
+        all_messages = []
+
+        # Scan the reports directory for relevant files
+        for filename in os.listdir(reports_dir):
+            if board_name in filename and filename.endswith('.json'):
+                report_file_path = os.path.join(reports_dir, filename)
+                try:
+                    with open(report_file_path, 'r') as file:
+                        report_content = json.load(file)
+                        # Add red tag messages
+                        all_messages.extend(report_content.get("red_tag_messages", []))
+                except Exception as e:
+                    print(f"Error loading messages from {report_file_path}: {e}")
+
+        # Sort messages by red tag message
+        all_messages.sort(key=lambda x: x.get("red_tag_message", "").lower())  # Use lower() for case-insensitive sorting
+        
+        # Convert messages to HTML and display
+        html = messages_to_html(all_messages)
+        self.message_display.setHtml(html)
+
     def git_pull(self):
         """Function to run git fetch and then git pull command in the current script's directory."""
         # Get the directory where the script is located
@@ -498,7 +590,315 @@ class ReportNotFoundDialog(QDialog):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to create report file: {str(e)}")
 
+class ApplyRedTagDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Apply Red Tag")
+        self.resize(400, 300)
+
+        # Load the red tag messages from apply_messages.json
+        self.red_tag_messages = self.load_red_tag_messages()
+
+        # Create layout
+        layout = QVBoxLayout()
+
+        # Create a group box for radio buttons
+        self.radio_group = QGroupBox("Select a Red Tag Message:")
+        radio_layout = QVBoxLayout()
+
+        # Add radio buttons for each message
+        self.radio_buttons = []
+        for message in self.red_tag_messages:
+            radio_button = QRadioButton(message)
+            self.radio_buttons.append(radio_button)
+            radio_layout.addWidget(radio_button)
+
+        self.radio_group.setLayout(radio_layout)
+        layout.addWidget(self.radio_group)
+
+        # Create Edit List and Apply Message buttons
+        button_layout = QHBoxLayout()
+        edit_button = QPushButton("Edit List", clicked=self.open_edit_list_dialog)
+        apply_button = QPushButton("Apply Message", clicked=self.open_apply_message_dialog)
+
+        button_layout.addWidget(edit_button)
+        button_layout.addWidget(apply_button)
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def load_red_tag_messages(self):
+        """Load red tag messages from apply_messages.json."""
+        json_path = os.path.join(os.getcwd(), 'apply_messages.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r') as file:
+                data = json.load(file)
+                return data.get("red_tag_messages", [])
+        return []
+
+    def open_edit_list_dialog(self):
+        """Open the Edit List dialog."""
+        edit_dialog = EditRedTagListDialog(self.red_tag_messages, self)
+        edit_dialog.exec_()
+        # Reload the dialog with the updated messages
+        self.red_tag_messages = self.load_red_tag_messages()
+        self.refresh_radio_buttons()
+
+    def refresh_radio_buttons(self):
+        """Refresh the radio buttons to reflect the updated message list."""
+        layout = self.radio_group.layout()
+        # Clear existing buttons
+        for i in reversed(range(layout.count())):
+            widget = layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
+
+        # Add updated radio buttons
+        self.radio_buttons = []
+        for message in self.red_tag_messages:
+            radio_button = QRadioButton(message)
+            self.radio_buttons.append(radio_button)
+            layout.addWidget(radio_button)
+
+    def open_apply_message_dialog(self):
+        """Open the Apply Message dialog with a barcode scanner field."""
+        apply_message_dialog = ApplyMessageDialog(self)
+        apply_message_dialog.exec_()
+
+
+class EditRedTagListDialog(QDialog):
+    def __init__(self, messages, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Edit Red Tag Messages")
+        self.resize(400, 300)
+        self.messages = messages
+        self.json_path = os.path.join(os.getcwd(), 'apply_messages.json')
+
+        # Layout
+        layout = QVBoxLayout()
+
+        # Add checkboxes for each message
+        self.checkboxes = []
+        for message in self.messages:
+            checkbox = QCheckBox(message)
+            self.checkboxes.append(checkbox)
+            layout.addWidget(checkbox)
+
+        # Form layout to add a new message
+        form_layout = QFormLayout()
+        self.new_message_input = QLineEdit()
+        form_layout.addRow("Add New Message:", self.new_message_input)
+        layout.addLayout(form_layout)
+
+        # Buttons to add a new message and delete selected messages
+        button_layout = QHBoxLayout()
+        add_button = QPushButton("Add Message", clicked=self.add_message)
+        delete_button = QPushButton("Delete Messages", clicked=self.delete_messages)
+        button_layout.addWidget(add_button)
+        button_layout.addWidget(delete_button)
+
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def add_message(self):
+        """Add a new message to the list."""
+        new_message = self.new_message_input.text().strip()
+        if new_message:
+            self.messages.append(new_message)
+            self.save_messages()
+            self.new_message_input.clear()
+            self.close()
+
+    def delete_messages(self):
+        """Delete selected messages."""
+        self.messages = [cb.text() for cb in self.checkboxes if not cb.isChecked()]
+        self.save_messages()
+        self.close()
+
+    def save_messages(self):
+        """Save the updated messages to apply_messages.json."""
+        with open(self.json_path, 'w') as file:
+            json.dump({"red_tag_messages": self.messages}, file, indent=4)
+
+
+class ApplyMessageDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Apply Red Tag Message")
+        self.resize(400, 200)
+
+        # Layout
+        layout = QVBoxLayout()
+
+        # Barcode scanner input
+        self.barcode_input = QLineEdit()
+        self.barcode_input.setPlaceholderText("Scan Barcode Here...")
+        layout.addWidget(QLabel("Barcode Scanner:"))
+        layout.addWidget(self.barcode_input)
+
+        # Done button to close the dialog
+        done_button = QPushButton("Done", clicked=self.close)
+        layout.addWidget(done_button)
+
+        self.setLayout(layout)
+
+class ApplyProcessFlowDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Apply Process Flow Message")
+        self.resize(400, 300)
+
+        # Load the process flow messages from apply_messages.json
+        self.process_flow_messages = self.load_process_flow_messages()
+
+        # Create layout
+        layout = QVBoxLayout()
+
+        # Create a group box for radio buttons
+        self.radio_group = QGroupBox("Select a Process Flow Message:")
+        radio_layout = QVBoxLayout()
+
+        # Add radio buttons for each message
+        self.radio_buttons = []
+        for message in self.process_flow_messages:
+            radio_button = QRadioButton(message)
+            self.radio_buttons.append(radio_button)
+            radio_layout.addWidget(radio_button)
+
+        self.radio_group.setLayout(radio_layout)
+        layout.addWidget(self.radio_group)
+
+        # Create Edit List and Apply Message buttons
+        button_layout = QHBoxLayout()
+        edit_button = QPushButton("Edit List", clicked=self.open_edit_list_dialog)
+        apply_button = QPushButton("Apply Message", clicked=self.open_apply_message_dialog)
+
+        button_layout.addWidget(edit_button)
+        button_layout.addWidget(apply_button)
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def load_process_flow_messages(self):
+        """Load process flow messages from apply_messages.json."""
+        json_path = os.path.join(os.getcwd(), 'apply_messages.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r') as file:
+                data = json.load(file)
+                return data.get("process_flow_messages", [])
+        return []
+
+    def open_edit_list_dialog(self):
+        """Open the Edit List dialog."""
+        edit_dialog = EditProcessFlowListDialog(self.process_flow_messages, self)
+        edit_dialog.exec_()
+        # Reload the dialog with the updated messages
+        self.process_flow_messages = self.load_process_flow_messages()
+        self.refresh_radio_buttons()
+
+    def refresh_radio_buttons(self):
+        """Refresh the radio buttons to reflect the updated message list."""
+        layout = self.radio_group.layout()
+        # Clear existing buttons
+        for i in reversed(range(layout.count())):
+            widget = layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
+
+        # Add updated radio buttons
+        self.radio_buttons = []
+        for message in self.process_flow_messages:
+            radio_button = QRadioButton(message)
+            self.radio_buttons.append(radio_button)
+            layout.addWidget(radio_button)
+
+    def open_apply_message_dialog(self):
+        """Open the Apply Message dialog with a barcode scanner field."""
+        apply_message_dialog = ApplyProcessFlowMessageDialog(self)
+        apply_message_dialog.exec_()
+
+
+class EditProcessFlowListDialog(QDialog):
+    def __init__(self, messages, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Edit Process Flow Messages")
+        self.resize(400, 300)
+        self.messages = messages
+        self.json_path = os.path.join(os.getcwd(), 'apply_messages.json')
+
+        # Layout
+        layout = QVBoxLayout()
+
+        # Add checkboxes for each message
+        self.checkboxes = []
+        for message in self.messages:
+            checkbox = QCheckBox(message)
+            self.checkboxes.append(checkbox)
+            layout.addWidget(checkbox)
+
+        # Form layout to add a new message
+        form_layout = QFormLayout()
+        self.new_message_input = QLineEdit()
+        form_layout.addRow("Add New Message:", self.new_message_input)
+        layout.addLayout(form_layout)
+
+        # Buttons to add a new message and delete selected messages
+        button_layout = QHBoxLayout()
+        add_button = QPushButton("Add Message", clicked=self.add_message)
+        delete_button = QPushButton("Delete Messages", clicked=self.delete_messages)
+        button_layout.addWidget(add_button)
+        button_layout.addWidget(delete_button)
+
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def add_message(self):
+        """Add a new message to the list."""
+        new_message = self.new_message_input.text().strip()
+        if new_message:
+            self.messages.append(new_message)
+            self.save_messages()
+            self.new_message_input.clear()
+            self.close()
+
+    def delete_messages(self):
+        """Delete selected messages."""
+        self.messages = [cb.text() for cb in self.checkboxes if not cb.isChecked()]
+        self.save_messages()
+        self.close()
+
+    def save_messages(self):
+        """Save the updated messages to apply_messages.json."""
+        with open(self.json_path, 'w') as file:
+            json.dump({"process_flow_messages": self.messages}, file, indent=4)
+
+
+class ApplyProcessFlowMessageDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Apply Process Flow Message")
+        self.resize(400, 200)
+
+        # Layout
+        layout = QVBoxLayout()
+
+        # Barcode scanner input
+        self.barcode_input = QLineEdit()
+        self.barcode_input.setPlaceholderText("Scan Barcode Here...")
+        layout.addWidget(QLabel("Barcode Scanner:"))
+        layout.addWidget(self.barcode_input)
+
+        # Done button to close the dialog
+        done_button = QPushButton("Done", clicked=self.close)
+        layout.addWidget(done_button)
+
+        self.setLayout(layout)
+
 if __name__ == "__main__":
+    current_directory = os.getcwd()
+    check_for_updates(current_directory)
     parent_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
     app = QApplication(sys.argv)
     ex = TestLauncher(parent_directory)

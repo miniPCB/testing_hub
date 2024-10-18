@@ -10,11 +10,13 @@
     "red_tag_messages": [
         {
             "timestamp": "20241015_152714",
-            "red_tag_message": "Production: All CAM orientation is not correct"
+            "red_tag_message": "All CAM orientation is not correct",
+            "source": "Production"
         },
         {
             "timestamp": "20241015_152757",
-            "red_tag_message": "Production: CAMs wont boot up"
+            "red_tag_message": "CAMs wont boot up",
+            "source": "Production"
         }
     ]
 }

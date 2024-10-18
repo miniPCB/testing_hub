@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241016_104047",
-            "red_tag_message": "Production: No zoom, Focus, or PIRIS"
+            "red_tag_message": "No zoom, Focus, or PIRIS",
+            "source": "Production"
         }
     ]
 }

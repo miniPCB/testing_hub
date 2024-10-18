@@ -10,7 +10,8 @@
     "red_tag_messages": [
         {
             "timestamp": "20241016_104338",
-            "red_tag_message": "Production: Does not zoom"
+            "red_tag_message": "Does not zoom",
+            "source": "Production"
         }
     ]
 }

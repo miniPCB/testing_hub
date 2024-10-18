@@ -51,6 +51,36 @@ def check_gitpython():
         install_gitpython()
         return check_gitpython()  # Retry import after installation
 
+def check_for_updates(directory):
+    """Checks for updates in the specified Git repository directory and pulls if updates are available."""
+    try:
+        # Change to the script directory
+        os.chdir(directory)
+
+        # Run git fetch to check for updates
+        fetch_result = subprocess.run(['git', 'fetch'], capture_output=True, text=True)
+
+        if fetch_result.returncode != 0:
+            print("Error fetching updates:", fetch_result.stderr)
+            return
+
+        # Check the status to see if we are behind
+        status_result = subprocess.run(['git', 'status', '-uno'], capture_output=True, text=True)
+
+        if 'Your branch is behind' in status_result.stdout:
+            print("Updates available. Pulling the latest changes...")
+            pull_result = subprocess.run(['git', 'pull'], capture_output=True, text=True)
+
+            if pull_result.returncode == 0:
+                print("Successfully pulled updates:", pull_result.stdout)
+            else:
+                print("Error pulling updates:", pull_result.stderr)
+        else:
+            print("No updates available.")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 def push_to_github(directory, commit_message):
     """Push changes to the specified GitHub repository."""
     try:
@@ -172,17 +202,20 @@ def red_tag_messages_json_to_html(data):
     <table border="1" style="width: 100%; border-collapse: collapse;">
         <tr>
             <th style="padding: 10px;">Timestamp</th>
+            <th style="padding: 10px;">Source</th>
             <th style="padding: 10px;">Message</th>
         </tr>
     """
 
     for message in red_tag_messages:
         timestamp = message.get("timestamp", "N/A")
+        source = message.get("source", "Unknown")  # Default to "Unknown" if no source is provided
         red_tag_message = message.get("red_tag_message", "No message available")
 
         html += f"""
         <tr>
             <td style="padding: 10px;">{timestamp}</td>
+            <td style="padding: 10px;">{source}</td>
             <td style="padding: 10px;">{red_tag_message}</td>
         </tr>
         """
@@ -221,6 +254,38 @@ def process_flow_json_to_html(process_flow_data):
     html += "</table>"
     return html
 
+def messages_to_html(messages):
+    """Convert messages to HTML format."""
+    if not messages:
+        return "<p>No messages available.</p>"
+
+    # Start building the HTML table
+    html = """
+    <h3>Messages</h3>
+    <table border="1" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <th style="padding: 10px;">Timestamp</th>
+            <th style="padding: 10px;">Source</th>
+            <th style="padding: 10px;">Message</th>
+        </tr>
+    """
+
+    for message in messages:
+        timestamp = message.get("timestamp", "N/A")
+        source = message.get("source", "Unknown")
+        red_tag_message = message.get("red_tag_message", "No message available")
+
+        html += f"""
+        <tr>
+            <td style="padding: 10px;">{timestamp}</td>
+            <td style="padding: 10px;">{source}</td>
+            <td style="padding: 10px;">{red_tag_message}</td>
+        </tr>
+        """
+
+    html += "</table>"
+    return html
+
 def add_red_tag_message(message, filename):
     """Adds a red tag message to the JSON file specified by the filename."""
     
@@ -231,10 +296,11 @@ def add_red_tag_message(message, filename):
     # Generate timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # Create new red tag message
+    # Create new red tag message with source
     new_message = {
         "timestamp": timestamp,
-        "red_tag_message": message
+        "source": message.get("source"),  # Add source from the message dictionary
+        "red_tag_message": message.get("red_tag_message")  # Add message from the dictionary
     }
 
     # Append new message to red tag messages
@@ -244,7 +310,7 @@ def add_red_tag_message(message, filename):
     with open(filename, 'w') as file:
         json.dump(data, file, indent=4)
     
-    # Push to github
+    # Push to GitHub
     push_to_github(REPO_DIR, "Added red tag message")
 
 def load_red_tag_messages(self):

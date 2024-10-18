@@ -9,8 +9,9 @@
     "process_flow_messages": [],
     "red_tag_messages": [
         {
-            "timestamp": "20241011_150337",
-            "red_tag_message": "3V3 SHORT, NOT BGA"
+            "timestamp": "20241018_124610",
+            "source": "Engineer",
+            "red_tag_message": "3V3 SHORT, Not BGA"
         }
     ]
 }
