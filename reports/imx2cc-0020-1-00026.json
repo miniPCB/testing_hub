@@ -95,6 +95,9 @@
                     "measured_value": 0.734,
                     "conclusion": "Pass"
                 }
+            ],
+            "images": [
+                "imx2cc-0020-1-00026_20241023_184149.png"
             ]
         }
     ],
