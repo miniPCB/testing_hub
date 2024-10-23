@@ -485,5 +485,11 @@
                 }
             ]
         }
+    ],
+    "process_flow_messages": [
+        {
+            "datetime": "2024-10-13 18:41:17",
+            "process_flow_message": "Applied Barcode"
+        }
     ]
 }
