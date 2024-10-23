@@ -4,7 +4,7 @@ import subprocess
 from datetime import datetime
 import json
 import shutil
-from common import (parse_pcb_barcode, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, 
+from common import (parse_pcb_barcode, push_to_github, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, 
                     load_red_tag_messages, add_red_tag_message, save_red_tag_messages, check_for_updates, messages_to_html)
 
 def ensure_pyqt_installed():
@@ -528,6 +528,10 @@ class TestLauncher(QMainWindow):
                     # Write back the updated report
                     with open(report_file_path, 'w') as file:
                         json.dump(report_content, file, indent=4)
+
+                    # Push to github
+                    REPO_DIR = os.path.dirname(os.path.abspath(__file__))
+                    push_to_github(REPO_DIR, "Added image")
 
                     # Refresh the images tab to display the newly added image
                     self.setup_images_tab(report_content['test_reports'], images_dir)

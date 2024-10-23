@@ -3,7 +3,10 @@
         {
             "timestamp": "20241016_104309",
             "barcode": "pt_tlxx-0002-3-00878",
-            "overall_status": "Fail"
+            "overall_status": "Fail",
+            "images": [
+                "pt_tlxx-0002-3-00878_20241023_183213.png"
+            ]
         }
     ],
     "process_flow_messages": [],
