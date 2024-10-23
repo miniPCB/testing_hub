@@ -1,0 +1,27 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_150948",
+            "barcode": "bagwell_tx2-0015-4-00058",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_151041",
+            "red_tag_message": "All CAM orientation is not correct",
+            "source": "Production"
+        },
+        {
+            "timestamp": "20241015_151124",
+            "red_tag_message": "\"Could not set heater pwm\" error message in gui log",
+            "source": "Production"
+        },
+        {
+            "timestamp": "20241015_151204",
+            "red_tag_message": "\"Could not set fan pwm\" error message in gui log",
+            "source": "Production"
+        }
+    ]
+}

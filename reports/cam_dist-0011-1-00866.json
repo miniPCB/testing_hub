@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_152412",
+            "barcode": "cam_dist-0011-1-00866",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_152438",
+            "red_tag_message": "Cameras will not boot up",
+            "source": "Production"
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_150756",
+            "barcode": "pt_tlxx-0002-3-01954",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_150820",
+            "red_tag_message": "CAM does not pan",
+            "source": "Production"
+        }
+    ]
+}

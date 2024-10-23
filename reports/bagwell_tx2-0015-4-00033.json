@@ -1,0 +1,22 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_152626",
+            "barcode": "bagwell_tx2-0015-4-00033",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_152714",
+            "red_tag_message": "All CAM orientation is not correct",
+            "source": "Production"
+        },
+        {
+            "timestamp": "20241015_152757",
+            "red_tag_message": "CAMs wont boot up",
+            "source": "Production"
+        }
+    ]
+}

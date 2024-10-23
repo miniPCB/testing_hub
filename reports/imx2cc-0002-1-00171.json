@@ -1,0 +1,16 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_183947",
+            "barcode": "imx2cc-0002-1-00171",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_184023",
+            "red_tag_message": "Short circuit under U1 (BGA)."
+        }
+    ]
+}

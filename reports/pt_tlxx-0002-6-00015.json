@@ -1,0 +1,27 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_101433",
+            "barcode": "pt_tlxx-0002-6-00015",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_101514",
+            "red_tag_message": "unable to see FPGA",
+            "source": "Production"
+        },
+        {
+            "timestamp": "20241016_101548",
+            "red_tag_message": "\"could not initiate heaters\" error message in gui log",
+            "source": "Production"
+        },
+        {
+            "timestamp": "20241016_101617",
+            "red_tag_message": "\"could not set a fan PWM\" error message in gui log",
+            "source": "Production"
+        }
+    ]
+}

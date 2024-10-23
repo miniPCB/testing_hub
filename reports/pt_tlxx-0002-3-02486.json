@@ -9,12 +9,9 @@
     "process_flow_messages": [],
     "red_tag_messages": [
         {
-            "timestamp": "20241011_150249",
-            "red_tag_message": "No LED, 3V3 SHORT"
-        },
-        {
-            "timestamp": "20241011_150319",
-            "red_tag_message": "Not BGA"
+            "timestamp": "20241018_124511",
+            "source": "Engineer",
+            "red_tag_message": "No LED, 3V3 SHORT, Not BGA"
         }
     ]
 }

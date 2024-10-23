@@ -98,11 +98,6 @@
             ]
         }
     ],
-    "process_flow_messages": [
-        {
-            "datetime": "2024-10-13 18:29:22",
-            "process_flow_message": "Applied Barcode"
-        }
-    ],
+    "process_flow_messages": [],
     "red_tag_messages": []
 }

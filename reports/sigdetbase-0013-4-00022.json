@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241018_105330",
+            "barcode": "sigdetbase-0013-4-00022",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241018_105509",
+            "red_tag_message": "Gui does not display MFM+",
+            "source": "Production"
+        }
+    ]
+}

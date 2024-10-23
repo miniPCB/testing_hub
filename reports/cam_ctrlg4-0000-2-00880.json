@@ -1,0 +1,22 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_144556",
+            "barcode": "cam_ctrlg4-0000-2-00880",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_144637",
+            "red_tag_message": "Temp not found",
+            "source": "Production"
+        },
+        {
+            "timestamp": "20241015_144853",
+            "red_tag_message": "Humidy not found error message from log file in cyclops gui deb 20240415",
+            "source": "Production"
+        }
+    ]
+}

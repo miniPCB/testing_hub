@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_103853",
+            "barcode": "pt_tlxx-0002-3-00030",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_103940",
+            "red_tag_message": "No PIRIS",
+            "source": "Production"
+        }
+    ]
+}

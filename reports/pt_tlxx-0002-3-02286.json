@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241016_101714",
+            "barcode": "pt_tlxx-0002-3-02286",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241016_101751",
+            "red_tag_message": "Solder bad on zoom/focus connector",
+            "source": "Production"
+        }
+    ]
+}

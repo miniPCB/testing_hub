@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_150853",
+            "barcode": "pt_tlxx-0002-3-02103",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_150923",
+            "red_tag_message": "Does not pan module",
+            "source": "Production"
+        }
+    ]
+}

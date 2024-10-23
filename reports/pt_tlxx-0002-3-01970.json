@@ -1,0 +1,17 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241015_151228",
+            "barcode": "pt_tlxx-0002-3-01970",
+            "overall_status": "Fail"
+        }
+    ],
+    "process_flow_messages": [],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241015_151320",
+            "red_tag_message": "Cause of lens not zooming",
+            "source": "Production"
+        }
+    ]
+}
