@@ -3,7 +3,11 @@
         {
             "timestamp": "20241016_183947",
             "barcode": "imx2cc-0002-1-00171",
-            "overall_status": "Fail"
+            "overall_status": "Fail",
+            "images": [
+                "imx2cc-0002-1-00171_20241023_182442.png",
+                "imx2cc-0002-1-00171_20241023_182504.png"
+            ]
         }
     ],
     "process_flow_messages": [],
