@@ -15,6 +15,11 @@
             "timestamp": "20241023_193536",
             "source": "Production",
             "red_tag_message": "This is a red tag message"
+        },
+        {
+            "timestamp": "20241023_193547",
+            "source": "Assembly",
+            "red_tag_message": "From assembly."
         }
     ]
 }
