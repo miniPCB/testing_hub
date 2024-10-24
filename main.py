@@ -4,8 +4,8 @@ import subprocess
 from datetime import datetime
 import json
 import shutil
-from common import (parse_pcb_barcode, push_to_github, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, 
-                    load_red_tag_messages, add_red_tag_message, save_red_tag_messages, check_for_updates, messages_to_html)
+from common import (parse_pcb_barcode, push_to_github, report_json_to_html, red_tag_messages_json_to_html, process_flow_json_to_html, report_json_to_md,
+                    load_red_tag_messages, add_red_tag_message, save_red_tag_messages, check_for_updates, messages_to_html, send_report_via_slack)
 
 def ensure_pyqt_installed():
     """Ensure PyQt5 is installed."""
@@ -211,7 +211,7 @@ class TestLauncher(QMainWindow):
 
         # Create Reports Display tab
         self.reports_display_tab = QWidget()
-        self.setup_reports_display_tab()
+        self.setup_reports_display_tab()  # Call to set up the Reports Display tab
         self.sub_tab_widget.addTab(self.reports_display_tab, "Reports Display")
 
         # Create Process Flow tab
@@ -231,12 +231,50 @@ class TestLauncher(QMainWindow):
         self.reports_tab.setLayout(layout)
 
     def setup_reports_display_tab(self):
-        """Sets up the Reports Display tab UI."""
+        """Sets up the Reports Display tab UI with a custom right-click context menu."""
         layout = QVBoxLayout()
         self.report_display = QTextEdit()
         self.report_display.setReadOnly(True)
+
+        # Enable custom context menu
+        self.report_display.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.report_display.customContextMenuRequested.connect(self.show_report_context_menu)
         layout.addWidget(self.report_display)
         self.reports_display_tab.setLayout(layout)
+
+    def show_report_context_menu(self, position):
+        """Show the custom context menu for the report display."""
+        # Create the menu
+        menu = QMenu()
+
+        # Add actions
+        slack_share_action = menu.addAction("Share Report via Slack")
+
+        # Connect actions to methods
+        slack_share_action.triggered.connect(self.slack_share_report)
+
+        # Display the menu at the cursor position
+        menu.exec_(self.report_display.viewport().mapToGlobal(position))
+
+    def slack_share_report(self):
+        """Share the current report via Slack."""
+        if hasattr(self, 'last_opened_file'):
+            # Load the report content from the last opened file
+            with open(self.last_opened_file, 'r') as file:
+                report_content = json.load(file)
+            
+            # Convert the report content to HTML using report_json_to_html
+            report_html = report_json_to_md(report_content)
+            
+            # Define your Slack webhook URL
+            slack_webhook_url = "https://webhook.site/564f5d3d-7bc0-4a34-959d-c2dae19cf24e"  # Replace with your webhook URL
+            
+            # Send the HTML report to Slack
+            try:
+                send_report_via_slack(report_html, slack_webhook_url)
+                QMessageBox.information(self, "Success", "Report shared via Slack!")
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"Failed to share report via Slack: {str(e)}")
 
     def setup_process_flow_tab(self):
         """Sets up the Process Flow tab UI."""

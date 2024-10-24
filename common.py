@@ -2,6 +2,7 @@ import re
 import json
 import sys
 import subprocess
+import requests
 import os
 import time
 from datetime import datetime
@@ -189,6 +190,26 @@ def report_json_to_html(data):
     html += '</body></html>'
     return html
 
+def report_json_to_md(data):
+    """Convert JSON data to a well-formatted Markdown representation."""
+    md = "# Test Reports\n"
+    
+    for report in data.get("test_reports", []):
+        md += f"## Report Timestamp: {report['timestamp']}\n"
+        md += f"**Barcode**: `{report['barcode']}`\n"
+        md += f"**Overall Status**: {'*Pass*' if report['overall_status'] == 'Pass' else '*Fail*'}\n"
+
+        md += "\n### Test Results:\n"
+        md += "| Test Number | Description | Target Value | Lower Limit | Upper Limit | Measured Value | Conclusion |\n"
+        md += "|-------------|-------------|--------------|-------------|-------------|----------------|------------|\n"
+
+        for result in report.get("test_results", []):
+            md += f"| {result['test_number']} | {result['description']} | {result['target_value']} | {result['lower_limit']} | {result['upper_limit']} | {result['measured_value']} | {'Pass' if result['conclusion'] == 'Pass' else 'Fail'} |\n"
+
+        md += "\n"
+
+    return md
+
 def red_tag_messages_json_to_html(data):
     """Convert red tag messages JSON data to HTML format."""
     red_tag_messages = data.get("red_tag_messages", [])
@@ -358,3 +379,24 @@ def update_red_tag_message(old_message, new_message, report_file):
             json.dump(data, file, indent=4)
     except Exception as e:
         print(f"Error updating red tag message: {str(e)}")
+
+def send_report_via_slack(report_md, slack_webhook_url):
+    """Send the HTML report to Slack."""
+    # Slack does not render HTML directly, so we can send it as preformatted text
+    slack_data = {
+        "text": f"New report shared: ```{report_md}```",  # Sending as preformatted text block
+    }
+
+    # Send the request to Slack (or the test webhook)
+    response = requests.post(slack_webhook_url, json=slack_data)
+
+    # Check the response
+    if response.status_code != 200:
+        raise Exception(f"Failed to send message to Slack: {response.status_code}, {response.text}")
+    else:
+        print("Report successfully sent to Slack!")
+
+# Example usage
+#slack_webhook_url = "https://hooks.slack.com/services/your/webhook/url"  # Replace with your webhook URL
+#report_data = "This is the report content or a link to it."
+#send_report_via_slack(report_data, slack_webhook_url)
