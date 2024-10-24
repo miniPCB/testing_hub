@@ -1,0 +1,21 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241024_182859",
+            "barcode": "imx2cc-0002-1-00145",
+            "overall_status": "Unknown",
+            "test_results": []
+        }
+    ],
+    "process_flow_messages": [
+        {
+            "message": "Applied Barcode",
+            "timestamp": "2024-10-24 18:28:59"
+        },
+        {
+            "message": "Initial Testing: Fail",
+            "timestamp": "2024-10-24 18:32:19"
+        }
+    ],
+    "red_tag_messages": []
+}

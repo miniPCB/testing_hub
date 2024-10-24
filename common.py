@@ -263,7 +263,7 @@ def process_flow_json_to_html(process_flow_data):
 
     for message in process_flow_messages:
         timestamp = message.get("timestamp", "N/A")
-        process_flow_message = message.get("process_flow_message", "No message available")
+        process_flow_message = message.get("message", "No message available")
 
         html += f"""
         <tr>
@@ -382,9 +382,8 @@ def update_red_tag_message(old_message, new_message, report_file):
 
 def send_report_via_slack(report_md, slack_webhook_url):
     """Send the HTML report to Slack."""
-    # Slack does not render HTML directly, so we can send it as preformatted text
     slack_data = {
-        "text": f"New report shared: ```{report_md}```",  # Sending as preformatted text block
+        f"{report_md}"
     }
 
     # Send the request to Slack (or the test webhook)
@@ -395,8 +394,3 @@ def send_report_via_slack(report_md, slack_webhook_url):
         raise Exception(f"Failed to send message to Slack: {response.status_code}, {response.text}")
     else:
         print("Report successfully sent to Slack!")
-
-# Example usage
-#slack_webhook_url = "https://hooks.slack.com/services/your/webhook/url"  # Replace with your webhook URL
-#report_data = "This is the report content or a link to it."
-#send_report_via_slack(report_data, slack_webhook_url)

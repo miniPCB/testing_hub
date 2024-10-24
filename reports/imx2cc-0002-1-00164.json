@@ -1,0 +1,27 @@
+{
+    "test_reports": [
+        {
+            "timestamp": "20241024_182901",
+            "barcode": "imx2cc-0002-1-00164",
+            "overall_status": "Unknown",
+            "test_results": []
+        }
+    ],
+    "process_flow_messages": [
+        {
+            "message": "Applied Barcode",
+            "timestamp": "2024-10-24 18:29:01"
+        },
+        {
+            "message": "Initial Testing: Fail",
+            "timestamp": "2024-10-24 18:32:20"
+        }
+    ],
+    "red_tag_messages": [
+        {
+            "timestamp": "20241024_183526",
+            "source": "Engineer",
+            "red_tag_message": "Short circuit under BGA, U1"
+        }
+    ]
+}

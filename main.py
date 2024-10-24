@@ -18,11 +18,9 @@ def ensure_pyqt_installed():
 
 try:
     from PyQt5.QtWidgets import (
-    QMainWindow, QMenuBar, QMenu, QAction, QWidget, QVBoxLayout, QTabWidget, QListWidget, QTextEdit, QPushButton, 
-    QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, 
-    QPushButton, QMessageBox, QHBoxLayout, QTabWidget, QLineEdit, 
-    QListWidgetItem, QDialog, QInputDialog, QSizePolicy, QFileDialog,
-    QApplication, QWidget, QVBoxLayout, QLabel, QTextEdit, QListWidget, QMenuBar, QMenu, QAction, QComboBox
+        QMainWindow, QMenuBar, QMenu, QAction, QWidget, QVBoxLayout, QTabWidget, QListWidget, QTextEdit, 
+        QPushButton, QApplication, QLabel, QMessageBox, QHBoxLayout, QLineEdit, 
+        QListWidgetItem, QDialog, QInputDialog, QSizePolicy, QFileDialog, QComboBox, QRadioButton
     )
     from PyQt5.QtCore import QThread, pyqtSignal, Qt
     from PyQt5.QtGui import QPixmap
@@ -107,7 +105,7 @@ class TestLauncher(QMainWindow):
         self.show()
 
     def create_menu_bar(self):
-        """Creates the menu bar with File and View menus."""
+        """Creates the menu bar with File, View, and Apply menus."""
         menu_bar = self.menuBar()
 
         # File menu
@@ -121,6 +119,13 @@ class TestLauncher(QMainWindow):
         view_menu.addAction(QAction("Testing", self, triggered=lambda: self.tab_widget.setCurrentWidget(self.testing_tab)))
         view_menu.addAction(QAction("Reports", self, triggered=lambda: self.tab_widget.setCurrentWidget(self.reports_tab)))
         menu_bar.addMenu(view_menu)
+
+        # Apply menu
+        apply_menu = QMenu("Apply", self)
+        apply_process_message_action = QAction("Process Message", self)
+        apply_process_message_action.triggered.connect(self.open_process_message_dialog)
+        apply_menu.addAction(apply_process_message_action)
+        menu_bar.addMenu(apply_menu)
 
     def close_application(self):
         """Closes the application."""
@@ -721,6 +726,10 @@ class TestLauncher(QMainWindow):
         """Runs the test corresponding to the double-clicked item."""
         script, directory = self.script_mapping[item.text()]
         self.run_test(script, directory)
+    
+    def open_process_message_dialog(self):
+        dialog = ProcessMessageDialog(self)
+        dialog.exec_()
 
 class ReportNotFoundDialog(QDialog):
     def __init__(self, board_id, report_file_name, report_file_path, parent=None):
@@ -790,6 +799,252 @@ class ImageLabel(QLabel):
             scaled_pixmap = self.pixmap.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             super().setPixmap(scaled_pixmap)
         super().resizeEvent(event)
+
+class ProcessMessageDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Apply Process Message")
+        self.setMinimumSize(400, 300)
+
+        # Load messages from the JSON file
+        self.messages = self.load_messages_from_json()
+
+        # Layout for radio buttons
+        layout = QVBoxLayout(self)
+        self.selected_message = None
+        self.radio_buttons = []
+
+        # Create radio buttons for each message
+        for message in self.messages:
+            radio_button = QRadioButton(message)
+            radio_button.toggled.connect(self.on_message_selected)
+            layout.addWidget(radio_button)
+            self.radio_buttons.append(radio_button)
+
+        # Buttons for Edit, Apply, Add, Delete
+        button_layout = QHBoxLayout()
+
+        edit_button = QPushButton("Edit Message")
+        edit_button.clicked.connect(self.edit_message)
+        button_layout.addWidget(edit_button)
+
+        apply_button = QPushButton("Apply Message")
+        apply_button.clicked.connect(self.apply_message)
+        button_layout.addWidget(apply_button)
+
+        add_button = QPushButton("Add New Message")
+        add_button.clicked.connect(self.add_new_message)
+        button_layout.addWidget(add_button)
+
+        delete_button = QPushButton("Delete Message")
+        delete_button.clicked.connect(self.delete_message)
+        button_layout.addWidget(delete_button)
+
+        layout.addLayout(button_layout)
+
+    def load_messages_from_json(self):
+        """Load process messages from the JSON file."""
+        json_file = "apply_messages.json"  # Path to your JSON file
+
+        if os.path.exists(json_file):
+            with open(json_file, 'r') as file:
+                data = json.load(file)
+                return data.get("process_messages", [])
+        else:
+            QMessageBox.warning(self, "Error", "JSON file not found.")
+            return []
+
+    def save_messages_to_json(self):
+        """Save the updated messages to the JSON file."""
+        json_file = "apply_messages.json"
+
+        # Load the existing data
+        with open(json_file, 'r') as file:
+            data = json.load(file)
+
+        # Update the process_messages field with the new list
+        data["process_messages"] = self.messages
+
+        # Save back to the JSON file
+        with open(json_file, 'w') as file:
+            json.dump(data, file, indent=4)
+
+    def on_message_selected(self):
+        """Set the selected message when a radio button is toggled."""
+        for radio_button in self.radio_buttons:
+            if radio_button.isChecked():
+                self.selected_message = radio_button.text()
+                break
+
+    def edit_message(self):
+        """Edit the selected process message."""
+        if self.selected_message:
+            text, ok = QInputDialog.getText(self, "Edit Message", "Edit the selected message:", text=self.selected_message)
+            if ok and text:
+                # Update the message in the list
+                for i, message in enumerate(self.messages):
+                    if message == self.selected_message:
+                        self.messages[i] = text
+                        self.selected_message = text
+                        # Update the radio button text
+                        for radio_button in self.radio_buttons:
+                            if radio_button.isChecked():
+                                radio_button.setText(text)
+                        break
+                # Save the updated messages to the JSON file
+                self.save_messages_to_json()
+
+    def apply_message(self):
+        """Open the ApplyMessageDialog to scan barcodes and apply the selected message."""
+        if self.selected_message:
+            apply_dialog = ApplyMessageDialog(self.selected_message, self)
+            apply_dialog.exec_()
+        else:
+            QMessageBox.warning(self, "Error", "No message selected.")
+
+    def add_new_message(self):
+        """Add a new process message."""
+        text, ok = QInputDialog.getText(self, "Add New Message", "Enter a new message:")
+        if ok and text:
+            # Add the new message to the list
+            self.messages.append(text)
+
+            # Add a new radio button for the new message
+            new_radio_button = QRadioButton(text)
+            new_radio_button.toggled.connect(self.on_message_selected)
+            self.radio_buttons.append(new_radio_button)
+            self.layout().insertWidget(len(self.radio_buttons) - 1, new_radio_button)  # Insert at the right position
+
+            # Save the updated messages to the JSON file
+            self.save_messages_to_json()
+
+    def delete_message(self):
+        """Delete the selected process message."""
+        if self.selected_message:
+            confirm = QMessageBox.question(self, "Delete Message", f"Are you sure you want to delete '{self.selected_message}'?",
+                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if confirm == QMessageBox.Yes:
+                # Remove the selected message from the list
+                self.messages = [message for message in self.messages if message != self.selected_message]
+
+                # Find and remove the corresponding radio button
+                for radio_button in self.radio_buttons:
+                    if radio_button.text() == self.selected_message:
+                        radio_button.setParent(None)  # Remove the radio button from the layout
+                        self.radio_buttons.remove(radio_button)
+                        break
+
+                # Clear the selected message
+                self.selected_message = None
+
+                # Save the updated messages to the JSON file
+                self.save_messages_to_json()
+        else:
+            QMessageBox.warning(self, "Error", "No message selected.")
+
+class ApplyMessageDialog(QDialog):
+    def __init__(self, selected_message, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Apply Process Message")
+        self.setMinimumSize(400, 200)
+
+        self.selected_message = selected_message
+
+        layout = QVBoxLayout(self)
+
+        # Label to show the currently selected message
+        message_label = QLabel(f"Selected Process Message: {self.selected_message}")
+        layout.addWidget(message_label)
+
+        # Line edit where scanned barcodes will appear
+        self.barcode_input = QLineEdit(self)
+        self.barcode_input.setPlaceholderText("Scan barcode here...")
+        self.barcode_input.returnPressed.connect(self.on_barcode_scanned)
+        layout.addWidget(self.barcode_input)
+
+        # Text area to show feedback or the status of scanned barcodes
+        self.feedback_area = QTextEdit(self)
+        self.feedback_area.setReadOnly(True)
+        layout.addWidget(self.feedback_area)
+
+    def on_barcode_scanned(self):
+        barcode = self.barcode_input.text().strip()
+
+        # Process the scanned barcode
+        if barcode:
+            self.apply_process_message(barcode)
+            self.barcode_input.clear()  # Clear the input field for the next barcode
+
+    def apply_process_message(self, barcode):
+        """Apply the selected process message to the JSON file for the given barcode."""
+        # Use the parse_pcb_barcode function to get the board information
+        board_name, board_rev, board_var, board_sn = parse_pcb_barcode(barcode)
+
+        # Construct the JSON filename based on the parsed components and place it in the "reports" folder
+        reports_dir = "reports"
+        os.makedirs(reports_dir, exist_ok=True)  # Ensure the reports folder exists
+        json_file = os.path.join(reports_dir, f"{board_name}-{board_rev}-{board_var}-{board_sn.split('-')[0]}.json")
+
+        # Check if the JSON file exists
+        if not os.path.exists(json_file):
+            self.feedback_area.append(f"JSON file for {json_file} not found. Creating a new one.")
+            # Create a new JSON file with the default structure
+            self.create_new_json_file(json_file, board_name, board_rev, board_var, board_sn)
+
+        try:
+            # Load the existing data from the JSON file
+            with open(json_file, 'r') as file:
+                data = json.load(file)
+
+            # Get the current date and time
+            current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            # Ensure the "process_flow_messages" field exists and is a list
+            if "process_flow_messages" not in data:
+                data["process_flow_messages"] = []
+
+            # Append the selected message and timestamp to the process_flow_messages list
+            data["process_flow_messages"].append({
+                "message": self.selected_message,
+                "timestamp": current_datetime
+            })
+
+            # Save the updated data back to the JSON file
+            with open(json_file, 'w') as file:
+                json.dump(data, file, indent=4)
+
+            # Provide feedback to the user
+            self.feedback_area.append(f"Applied message to {json_file}: {self.selected_message} at {current_datetime}")
+
+        except Exception as e:
+            self.feedback_area.append(f"Error processing {json_file}: {e}")
+
+    def create_new_json_file(self, json_file, board_name, board_rev, board_var, board_sn):
+        """Creates a new JSON file with a default structure."""
+        try:
+            # Default structure of a new report JSON file
+            new_data = {
+                "test_reports": [
+                    {
+                        "timestamp": datetime.now().strftime("%Y%m%d_%H%M%S"),
+                        "barcode": f"{board_name}-{board_rev}-{board_var}-{board_sn}",
+                        "overall_status": "Unknown",
+                        "test_results": []
+                    }
+                ],
+                "process_flow_messages": [],
+                "red_tag_messages": []
+            }
+
+            # Save the new JSON file
+            with open(json_file, 'w') as file:
+                json.dump(new_data, file, indent=4)
+
+            self.feedback_area.append(f"New JSON file created: {json_file}")
+
+        except Exception as e:
+            self.feedback_area.append(f"Error creating new JSON file: {e}")
+
 
 if __name__ == "__main__":
     current_directory = os.getcwd()

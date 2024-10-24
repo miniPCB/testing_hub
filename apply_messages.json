@@ -2,5 +2,13 @@
     "red_tag_messages": [
         "3V3 SHORT",
         "1V8 SHORT"
+    ],
+    "process_messages": [
+        "Applied Barcode",
+        "Initial Testing: Pass",
+        "Initial Testing: Fail",
+        "Delivered to Production",
+        "Rejected by Production",
+        "Delivered to Engineer"
     ]
 }
