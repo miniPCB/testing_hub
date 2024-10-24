@@ -10,5 +10,11 @@
         }
     ],
     "process_flow_messages": [],
-    "red_tag_messages": []
+    "red_tag_messages": [
+        {
+            "timestamp": "20241023_193536",
+            "source": "Production",
+            "red_tag_message": "This is a red tag message"
+        }
+    ]
 }
