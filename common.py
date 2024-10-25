@@ -383,7 +383,7 @@ def update_red_tag_message(old_message, new_message, report_file):
 def send_report_via_slack(report_md, slack_webhook_url):
     """Send the HTML report to Slack."""
     slack_data = {
-        f"{report_md}",
+        "text": report_md
     }
 
     # Send the request to Slack (or the test webhook)
