@@ -381,12 +381,14 @@ def update_red_tag_message(old_message, new_message, report_file):
         print(f"Error updating red tag message: {str(e)}")
 
 def send_report_via_slack(report_md, slack_webhook_url):
-    """Send the HTML report to Slack."""
+    """Send the formatted report to Slack using mrkdwn."""
+    # Create the payload with mrkdwn enabled
     slack_data = {
-        "text": report_md
+        "text": report_md,
+        "mrkdwn": True  # Explicitly tell Slack to use mrkdwn formatting
     }
 
-    # Send the request to Slack (or the test webhook)
+    # Send the request to Slack
     response = requests.post(slack_webhook_url, json=slack_data)
 
     # Check the response

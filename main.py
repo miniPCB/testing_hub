@@ -272,7 +272,7 @@ class TestLauncher(QMainWindow):
             report_html = report_json_to_md(report_content)
             
             # Define your Slack webhook URL
-            slack_webhook_url = "https://webhook.site/564f5d3d-7bc0-4a34-959d-c2dae19cf24e"  # Replace with your webhook URL
+            slack_webhook_url = "https://hooks.slack.com/services/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"  # Replace with your webhook URL
             
             # Send the HTML report to Slack
             try:
