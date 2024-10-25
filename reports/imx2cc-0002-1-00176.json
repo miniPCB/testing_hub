@@ -15,6 +15,14 @@
         {
             "message": "Initial Testing: Fail",
             "timestamp": "2024-10-24 18:32:18"
+        },
+        {
+            "message": "Delivered to Engineer",
+            "timestamp": "2024-10-24 18:38:03"
+        },
+        {
+            "message": "Determined Unrepairable",
+            "timestamp": "2024-10-24 18:52:15"
         }
     ],
     "red_tag_messages": []

@@ -23,7 +23,7 @@ try:
         QListWidgetItem, QDialog, QInputDialog, QSizePolicy, QFileDialog, QComboBox, QRadioButton
     )
     from PyQt5.QtCore import QThread, pyqtSignal, Qt
-    from PyQt5.QtGui import QPixmap
+    from PyQt5.QtGui import QPixmap, QBrush, QColor
 except ImportError:
     print("PyQt5 is not installed. Installing now...")
     ensure_pyqt_installed()
@@ -362,14 +362,18 @@ class TestLauncher(QMainWindow):
                 item = QListWidgetItem(report_file)
                 with open(os.path.join(reports_dir, report_file), 'r') as file:
                     report_content = json.load(file)
-                    overall_status = report_content.get("test_reports", [{}])[0].get("overall_status", "Fail")
+                    overall_status = report_content.get("test_reports", [{}])[0].get("overall_status", "Unknown")
 
-                if overall_status == "Pass":
-                    item.setBackground(Qt.darkGreen)
-                    item.setForeground(Qt.white)
+                # Use QBrush and QColor for correct color setting
+                if overall_status.lower() == "pass":
+                    item.setBackground(QBrush(QColor("darkgreen")))
+                    item.setForeground(QBrush(QColor("white")))
+                elif overall_status.lower() == "fail":
+                    item.setBackground(QBrush(QColor("red")))
+                    item.setForeground(QBrush(QColor("white")))
                 else:
-                    item.setBackground(Qt.red)
-                    item.setForeground(Qt.white)
+                    item.setBackground(QBrush(QColor("lightgray")))
+                    item.setForeground(QBrush(QColor("black")))
 
                 self.file_list_widget.addItem(item)
 
@@ -389,15 +393,20 @@ class TestLauncher(QMainWindow):
                 report_file_path = os.path.join(reports_dir, report_file)
                 with open(report_file_path, 'r') as file:
                     report_content = json.load(file)
-                    overall_status = report_content.get("test_reports", [{}])[0].get("overall_status", "Fail")
+                    overall_status = report_content.get("test_reports", [{}])[0].get("overall_status", "Unknown")
 
                 item = QListWidgetItem(report_file)
-                if overall_status == "Pass":
-                    item.setBackground(Qt.darkGreen)
-                    item.setForeground(Qt.white)
+
+                # Apply the color scheme based on the overall_status
+                if overall_status.lower() == "pass":
+                    item.setBackground(QBrush(QColor("darkgreen")))
+                    item.setForeground(QBrush(QColor("white")))
+                elif overall_status.lower() == "fail":
+                    item.setBackground(QBrush(QColor("red")))
+                    item.setForeground(QBrush(QColor("white")))
                 else:
-                    item.setBackground(Qt.red)
-                    item.setForeground(Qt.white)
+                    item.setBackground(QBrush(QColor("lightgray")))
+                    item.setForeground(QBrush(QColor("black")))
 
                 self.file_list_widget.addItem(item)
 
@@ -997,7 +1006,7 @@ class ApplyMessageDialog(QDialog):
                 data = json.load(file)
 
             # Get the current date and time
-            current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            current_datetime = datetime.now().strftime("%Y%m%d_%H%M%S")
 
             # Ensure the "process_flow_messages" field exists and is a list
             if "process_flow_messages" not in data:
@@ -1040,10 +1049,13 @@ class ApplyMessageDialog(QDialog):
             with open(json_file, 'w') as file:
                 json.dump(new_data, file, indent=4)
 
-            self.feedback_area.append(f"New JSON file created: {json_file}")
+            self.feedback_area.append(f"New JSON file created:\n {json_file}\n")
+            # Push to github
+            REPO_DIR = os.path.dirname(os.path.abspath(__file__))
+            push_to_github(REPO_DIR, "Added process message")
 
         except Exception as e:
-            self.feedback_area.append(f"Error creating new JSON file: {e}")
+            self.feedback_area.append(f"Error creating new JSON file:\n {e}\n")
 
 
 if __name__ == "__main__":

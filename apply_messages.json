@@ -9,6 +9,7 @@
         "Initial Testing: Fail",
         "Delivered to Production",
         "Rejected by Production",
-        "Delivered to Engineer"
+        "Delivered to Engineer",
+        "Determined Unrepairable"
     ]
 }
